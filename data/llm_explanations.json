@@ -1,0 +1,14 @@
+[
+  {
+    "timestamp": "2026-02-27T19:38:59.389820Z",
+    "model": "openai/gpt-oss-120b",
+    "engine_version": "v3.0-enterprise",
+    "seed": 123,
+    "strategy": "strategy_a",
+    "prompt_hash": "605e22d1a4dd145f8d9ea6c16614bde290e4239fb9f7b236c60a80b72bc535b4",
+    "data_snapshot": {
+      "test": "data"
+    },
+    "executive_summary": "Persistence Test"
+  }
+]

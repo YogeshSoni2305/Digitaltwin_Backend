@@ -1,0 +1,542 @@
+[
+  {
+    "strategy": "no_replace",
+    "seed": 42,
+    "duration": 0.25,
+    "profit": 95572.16,
+    "structural_fragility": 0.0,
+    "behavioral_fragility": 14.0,
+    "variance_profit": 32380732.6819,
+    "stability_score": 0.0,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:24:41.262406Z"
+  },
+  {
+    "strategy": "immediate",
+    "seed": 42,
+    "duration": 0.25,
+    "profit": 93719.24,
+    "structural_fragility": 0.0,
+    "behavioral_fragility": 14.0,
+    "variance_profit": 57030830.2349,
+    "stability_score": 0.0,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:24:41.764282Z"
+  },
+  {
+    "strategy": "delayed",
+    "seed": 42,
+    "duration": 4.25,
+    "profit": 77540.74,
+    "structural_fragility": 0.0,
+    "behavioral_fragility": 14.0,
+    "variance_profit": 42188278.0943,
+    "stability_score": 0.0,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:24:42.279242Z"
+  },
+  {
+    "strategy": "no_replace",
+    "seed": 42,
+    "duration": 0.25,
+    "profit": 95572.16,
+    "structural_fragility": 0.0,
+    "behavioral_fragility": 14.0,
+    "variance_profit": 32380732.6819,
+    "stability_score": 0.0,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:25:09.524881Z"
+  },
+  {
+    "strategy": "immediate",
+    "seed": 42,
+    "duration": 0.25,
+    "profit": 93719.24,
+    "structural_fragility": 0.0,
+    "behavioral_fragility": 14.0,
+    "variance_profit": 57030830.2349,
+    "stability_score": 0.0,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:25:10.080839Z"
+  },
+  {
+    "strategy": "delayed",
+    "seed": 42,
+    "duration": 4.25,
+    "profit": 77540.74,
+    "structural_fragility": 0.0,
+    "behavioral_fragility": 14.0,
+    "variance_profit": 42188278.0943,
+    "stability_score": 0.0,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:25:10.602800Z"
+  },
+  {
+    "strategy": "no_replace",
+    "seed": 42,
+    "duration": 0.25,
+    "profit": 95572.16,
+    "structural_fragility": 0.0,
+    "behavioral_fragility": 14.0,
+    "variance_profit": 32380732.6819,
+    "stability_score": 0.0,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:25:46.437271Z"
+  },
+  {
+    "strategy": "immediate",
+    "seed": 42,
+    "duration": 0.25,
+    "profit": 93719.24,
+    "structural_fragility": 0.0,
+    "behavioral_fragility": 14.0,
+    "variance_profit": 57030830.2349,
+    "stability_score": 0.0,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:25:46.945006Z"
+  },
+  {
+    "strategy": "delayed",
+    "seed": 42,
+    "duration": 4.25,
+    "profit": 77540.74,
+    "structural_fragility": 0.0,
+    "behavioral_fragility": 14.0,
+    "variance_profit": 42188278.0943,
+    "stability_score": 0.0,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:25:47.435321Z"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0001",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T06:55:17.029145+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": null,
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T07:03:25.975669+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0001",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T07:37:24.023223+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0257",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:00:37.662432+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0257",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:00:40.086033+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0257",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:00:57.452725+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0257",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:00:59.958437+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0255",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:02:25.464991+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0255",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:02:29.889951+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0255",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:02:35.302301+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0255",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:02:40.463006+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0255",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:03:49.918683+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0255",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:03:54.229989+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0249",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:15:14.199780+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0249",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:15:16.319351+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0249",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:15:22.318065+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0249",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T08:15:24.453478+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0242",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T09:55:02.705901+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0243",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T09:58:52.474790+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0259",
+    "profit": -6722428.42,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T09:59:20.865402+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0093",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T12:41:32.484994+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0003",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:09:15.646397+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0003",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:09:16.152000+00:00"
+  },
+  {
+    "strategy": "delayed",
+    "employee_id": "EMP0003",
+    "profit": -4552045.78,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:09:16.652278+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0005",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:42:31.373911+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0005",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:42:31.869614+00:00"
+  },
+  {
+    "strategy": "delayed",
+    "employee_id": "EMP0005",
+    "profit": -4552045.78,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:42:32.366313+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0021",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:56:38.387315+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0021",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:56:38.891694+00:00"
+  },
+  {
+    "strategy": "delayed",
+    "employee_id": "EMP0021",
+    "profit": -4552045.78,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:56:39.390312+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0144",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T14:26:53.939906+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0069",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T15:37:27.511486+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0067",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T16:52:08.685360+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0003",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T17:58:52.554983+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0030",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:11:40.792623+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": "EMP0190",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:11:59.342423+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0009",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:12:27.005000+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0009",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:12:27.510966+00:00"
+  },
+  {
+    "strategy": "delayed",
+    "employee_id": "EMP0009",
+    "profit": -4552045.78,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:12:28.025140+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0007",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:29:49.955122+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0007",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:29:50.459635+00:00"
+  },
+  {
+    "strategy": "delayed",
+    "employee_id": "EMP0007",
+    "profit": -4552045.78,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:29:50.953370+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0007",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:33:38.445449+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0007",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:33:38.965653+00:00"
+  },
+  {
+    "strategy": "delayed",
+    "employee_id": "EMP0007",
+    "profit": -4552045.78,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:33:39.489337+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0007",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:33:46.094446+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0007",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:33:46.594476+00:00"
+  },
+  {
+    "strategy": "delayed",
+    "employee_id": "EMP0007",
+    "profit": -4552045.78,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:33:47.092719+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0009",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:34:05.954064+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0009",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:34:06.450718+00:00"
+  },
+  {
+    "strategy": "delayed",
+    "employee_id": "EMP0009",
+    "profit": -4552045.78,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:34:06.954154+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0069",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:34:41.254681+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0069",
+    "profit": -2709145.25,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:34:41.827008+00:00"
+  },
+  {
+    "strategy": "delayed",
+    "employee_id": "EMP0069",
+    "profit": -4552045.78,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:34:42.381018+00:00"
+  }
+]

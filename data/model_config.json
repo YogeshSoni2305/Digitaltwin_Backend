@@ -1,0 +1,18 @@
+{
+    "model_version": "v3.0",
+    "decision_weights": {
+        "profit": 0.35,
+        "org_health": 0.15,
+        "structural_fragility": 0.1,
+        "behavioral_fragility": 0.1,
+        "volatility": 0.15,
+        "burnout": 0.15
+    },
+    "burnout_threshold": 0.75,
+    "shock_strength": 0.2,
+    "noise_parameters": {
+        "task_duration_noise": 0.1,
+        "revenue_noise": 0.05,
+        "attrition_shock": 0.1
+    }
+}

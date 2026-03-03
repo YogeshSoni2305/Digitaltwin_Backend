@@ -1,0 +1,161 @@
+[
+  {
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "best_strategy": "no_replace",
+    "stability_score": 0.0,
+    "weights_used": {
+      "profit": 0.35,
+      "org_health": 0.15,
+      "structural_fragility": 0.1,
+      "behavioral_fragility": 0.1,
+      "volatility": 0.15,
+      "burnout": 0.15
+    },
+    "seed_used": 42,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:24:42.279724Z"
+  },
+  {
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "best_strategy": "no_replace",
+    "stability_score": 0.0,
+    "weights_used": {
+      "profit": 0.35,
+      "org_health": 0.15,
+      "structural_fragility": 0.1,
+      "behavioral_fragility": 0.1,
+      "volatility": 0.15,
+      "burnout": 0.15
+    },
+    "seed_used": 42,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:25:10.603343Z"
+  },
+  {
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "best_strategy": "no_replace",
+    "stability_score": 0.0,
+    "weights_used": {
+      "profit": 0.35,
+      "org_health": 0.15,
+      "structural_fragility": 0.1,
+      "behavioral_fragility": 0.1,
+      "volatility": 0.15,
+      "burnout": 0.15
+    },
+    "seed_used": 42,
+    "model_version": "v3.0",
+    "timestamp": "2026-02-27T19:25:47.435850Z"
+  },
+  {
+    "employee_id": "EMP0003",
+    "best_strategy": "no_replace",
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:09:16.652932+00:00"
+  },
+  {
+    "employee_id": "EMP0005",
+    "best_strategy": "no_replace",
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:42:32.366910+00:00"
+  },
+  {
+    "employee_id": "EMP0021",
+    "best_strategy": "no_replace",
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T13:56:39.390958+00:00"
+  },
+  {
+    "employee_id": "EMP0009",
+    "best_strategy": "no_replace",
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:12:28.026942+00:00"
+  },
+  {
+    "employee_id": "EMP0007",
+    "best_strategy": "no_replace",
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:29:50.954045+00:00"
+  },
+  {
+    "employee_id": "EMP0007",
+    "best_strategy": "no_replace",
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:33:39.490081+00:00"
+  },
+  {
+    "employee_id": "EMP0007",
+    "best_strategy": "no_replace",
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:33:47.093437+00:00"
+  },
+  {
+    "employee_id": "EMP0009",
+    "best_strategy": "no_replace",
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:34:06.954941+00:00"
+  },
+  {
+    "employee_id": "EMP0069",
+    "best_strategy": "no_replace",
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "model_version": "v3.0",
+    "persisted_at": "2026-02-28T18:34:42.381985+00:00"
+  }
+]

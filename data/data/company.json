@@ -1,0 +1,1032 @@
+{
+  "metadata": {
+    "company_name": "Nexora Digital Solutions",
+    "industry": "Technology Consulting",
+    "total_employees": 66,
+    "seed": 42
+  },
+  "employees": [
+    {
+      "id": "EMP0001",
+      "name": "Arjun Taylor",
+      "role": "Executive",
+      "department": "Executive",
+      "salary": 279184,
+      "skills": {
+        "leadership": 0.8,
+        "strategy": 0.79
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": null,
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0002",
+      "name": "Rohan Patel",
+      "role": "Executive",
+      "department": "Executive",
+      "salary": 308513,
+      "skills": {
+        "leadership": 0.82,
+        "strategy": 0.77
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0001",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0003",
+      "name": "Kabir Davis",
+      "role": "Executive",
+      "department": "Executive",
+      "salary": 392964,
+      "skills": {
+        "leadership": 0.81,
+        "strategy": 0.81
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0001",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0004",
+      "name": "Neha Moore",
+      "role": "Executive",
+      "department": "Executive",
+      "salary": 257811,
+      "skills": {
+        "leadership": 0.81,
+        "strategy": 0.78
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0001",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0005",
+      "name": "Ananya Verma",
+      "role": "Executive",
+      "department": "Executive",
+      "salary": 256956,
+      "skills": {
+        "leadership": 0.88,
+        "strategy": 0.86
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0001",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0006",
+      "name": "Priya Wilson",
+      "role": "Executive",
+      "department": "Executive",
+      "salary": 392853,
+      "skills": {
+        "leadership": 0.86,
+        "strategy": 0.82
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0001",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0007",
+      "name": "Kavya Jackson",
+      "role": "VP",
+      "department": "Engineering",
+      "salary": 216463,
+      "skills": {
+        "backend": 0.72,
+        "frontend": 0.65,
+        "data": 0.94,
+        "leadership": 0.85,
+        "strategy": 0.76
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0002",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0008",
+      "name": "Meera Singh",
+      "role": "VP",
+      "department": "Sales",
+      "salary": 192676,
+      "skills": {
+        "enterprise_sales": 0.88,
+        "client_acquisition": 0.86,
+        "communication": 0.79,
+        "leadership": 0.95,
+        "strategy": 0.81
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0004",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0009",
+      "name": "Michael Garcia",
+      "role": "VP",
+      "department": "Operations",
+      "salary": 218427,
+      "skills": {
+        "vendor_management": 0.85,
+        "delivery_management": 0.62,
+        "process_optimization": 0.68,
+        "leadership": 0.84,
+        "strategy": 0.76
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0004",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0010",
+      "name": "Daniel Martin",
+      "role": "VP",
+      "department": "Product",
+      "salary": 210512,
+      "skills": {
+        "roadmap_planning": 0.76,
+        "stakeholder_alignment": 0.89,
+        "analytics": 0.66,
+        "leadership": 0.85,
+        "strategy": 0.85
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0004",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0011",
+      "name": "Sophia Mehta",
+      "role": "VP",
+      "department": "Finance",
+      "salary": 189358,
+      "skills": {
+        "forecasting": 0.66,
+        "financial_modeling": 0.73,
+        "budgeting": 0.95,
+        "leadership": 0.9,
+        "strategy": 0.83
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0004",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0012",
+      "name": "Olivia Martinez",
+      "role": "VP",
+      "department": "HR",
+      "salary": 222504,
+      "skills": {
+        "talent_acquisition": 0.89,
+        "performance_management": 0.88,
+        "leadership": 0.86,
+        "strategy": 0.76
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0004",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0013",
+      "name": "Ethan Lee",
+      "role": "Director",
+      "department": "Engineering",
+      "salary": 177170,
+      "skills": {
+        "architecture": 0.83,
+        "devops": 0.74,
+        "frontend": 0.92,
+        "leadership": 0.87,
+        "strategy": 0.79
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0007",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0014",
+      "name": "Liam Johnson",
+      "role": "Director",
+      "department": "Engineering",
+      "salary": 156162,
+      "skills": {
+        "architecture": 0.86,
+        "cloud": 0.75,
+        "devops": 0.8,
+        "leadership": 0.85,
+        "strategy": 0.9
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0007",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0015",
+      "name": "Emma Anderson",
+      "role": "Director",
+      "department": "Engineering",
+      "salary": 149065,
+      "skills": {
+        "cloud": 0.86,
+        "data": 0.9,
+        "backend": 0.65,
+        "leadership": 0.82,
+        "strategy": 0.85
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0007",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0016",
+      "name": "Ava Perez",
+      "role": "Director",
+      "department": "Sales",
+      "salary": 179086,
+      "skills": {
+        "negotiation": 0.81,
+        "client_acquisition": 0.76,
+        "enterprise_sales": 0.69,
+        "leadership": 0.88,
+        "strategy": 0.89
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0008",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0017",
+      "name": "Noah Brown",
+      "role": "Director",
+      "department": "Sales",
+      "salary": 184583,
+      "skills": {
+        "negotiation": 0.87,
+        "enterprise_sales": 0.72,
+        "client_acquisition": 0.7,
+        "leadership": 0.82,
+        "strategy": 0.75
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0008",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0018",
+      "name": "Lucas Thomas",
+      "role": "Director",
+      "department": "Sales",
+      "salary": 187323,
+      "skills": {
+        "enterprise_sales": 0.78,
+        "communication": 0.64,
+        "negotiation": 0.82,
+        "leadership": 0.93,
+        "strategy": 0.83
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0008",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0019",
+      "name": "Isabella Sharma",
+      "role": "Director",
+      "department": "Operations",
+      "salary": 153035,
+      "skills": {
+        "process_optimization": 0.79,
+        "delivery_management": 0.87,
+        "vendor_management": 0.79,
+        "leadership": 0.8,
+        "strategy": 0.8
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0009",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0020",
+      "name": "Mason Smith",
+      "role": "Director",
+      "department": "Operations",
+      "salary": 141276,
+      "skills": {
+        "process_optimization": 0.68,
+        "delivery_management": 0.68,
+        "vendor_management": 0.8,
+        "leadership": 0.81,
+        "strategy": 0.86
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0009",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0021",
+      "name": "Logan Taylor",
+      "role": "Director",
+      "department": "Operations",
+      "salary": 144535,
+      "skills": {
+        "vendor_management": 0.83,
+        "process_optimization": 0.93,
+        "delivery_management": 0.66,
+        "leadership": 0.88,
+        "strategy": 0.84
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0009",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0022",
+      "name": "Amelia Patel",
+      "role": "Director",
+      "department": "Product",
+      "salary": 153880,
+      "skills": {
+        "analytics": 0.74,
+        "roadmap_planning": 0.84,
+        "stakeholder_alignment": 0.73,
+        "leadership": 0.93,
+        "strategy": 0.82
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0010",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0023",
+      "name": "Elijah Davis",
+      "role": "Director",
+      "department": "Product",
+      "salary": 156246,
+      "skills": {
+        "roadmap_planning": 0.61,
+        "analytics": 0.79,
+        "stakeholder_alignment": 0.81,
+        "leadership": 0.8,
+        "strategy": 0.86
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0010",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0024",
+      "name": "James Moore",
+      "role": "Director",
+      "department": "Product",
+      "salary": 143858,
+      "skills": {
+        "roadmap_planning": 0.9,
+        "analytics": 0.62,
+        "stakeholder_alignment": 0.68,
+        "leadership": 0.9,
+        "strategy": 0.78
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0010",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0025",
+      "name": "Charlotte Verma",
+      "role": "Director",
+      "department": "Finance",
+      "salary": 148671,
+      "skills": {
+        "forecasting": 0.87,
+        "budgeting": 0.88,
+        "financial_modeling": 0.67,
+        "leadership": 0.81,
+        "strategy": 0.81
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0011",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0026",
+      "name": "Benjamin Wilson",
+      "role": "Director",
+      "department": "Finance",
+      "salary": 167759,
+      "skills": {
+        "budgeting": 0.84,
+        "forecasting": 0.94,
+        "financial_modeling": 0.63,
+        "leadership": 0.86,
+        "strategy": 0.8
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0011",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0027",
+      "name": "Harper Jackson",
+      "role": "Director",
+      "department": "Finance",
+      "salary": 147161,
+      "skills": {
+        "financial_modeling": 0.79,
+        "forecasting": 0.65,
+        "budgeting": 0.66,
+        "leadership": 0.87,
+        "strategy": 0.88
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0011",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0028",
+      "name": "Henry Singh",
+      "role": "Director",
+      "department": "HR",
+      "salary": 144940,
+      "skills": {
+        "performance_management": 0.62,
+        "talent_acquisition": 0.95,
+        "leadership": 0.93,
+        "strategy": 0.9
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0012",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0029",
+      "name": "Alexander Garcia",
+      "role": "Director",
+      "department": "HR",
+      "salary": 189385,
+      "skills": {
+        "talent_acquisition": 0.74,
+        "performance_management": 0.77,
+        "leadership": 0.93,
+        "strategy": 0.89
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0012",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0030",
+      "name": "Scarlett Martin",
+      "role": "Director",
+      "department": "HR",
+      "salary": 150789,
+      "skills": {
+        "performance_management": 0.94,
+        "talent_acquisition": 0.69,
+        "leadership": 0.92,
+        "strategy": 0.82
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0012",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0031",
+      "name": "Sebastian Mehta",
+      "role": "Manager",
+      "department": "Engineering",
+      "salary": 137722,
+      "skills": {
+        "architecture": 0.65,
+        "cloud": 0.7,
+        "data": 0.94
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0013",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0032",
+      "name": "Victoria Martinez",
+      "role": "Manager",
+      "department": "Engineering",
+      "salary": 147957,
+      "skills": {
+        "architecture": 0.86,
+        "cloud": 0.62,
+        "backend": 0.8
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0013",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0033",
+      "name": "Matthew Lee",
+      "role": "Manager",
+      "department": "Engineering",
+      "salary": 142954,
+      "skills": {
+        "cloud": 0.94,
+        "frontend": 0.63,
+        "backend": 0.67
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0014",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0034",
+      "name": "Grace Johnson",
+      "role": "Manager",
+      "department": "Engineering",
+      "salary": 148996,
+      "skills": {
+        "backend": 0.64,
+        "frontend": 0.91,
+        "data": 0.69
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0014",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0035",
+      "name": "Jack Anderson",
+      "role": "Manager",
+      "department": "Engineering",
+      "salary": 148962,
+      "skills": {
+        "backend": 0.75,
+        "cloud": 0.8,
+        "architecture": 0.78
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0015",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0036",
+      "name": "Chloe Perez",
+      "role": "Manager",
+      "department": "Engineering",
+      "salary": 127089,
+      "skills": {
+        "frontend": 0.69,
+        "devops": 0.65,
+        "architecture": 0.83
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0015",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0037",
+      "name": "David Brown",
+      "role": "Manager",
+      "department": "Sales",
+      "salary": 139964,
+      "skills": {
+        "enterprise_sales": 0.76,
+        "negotiation": 0.95,
+        "communication": 0.95
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0016",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0038",
+      "name": "Luna Thomas",
+      "role": "Manager",
+      "department": "Sales",
+      "salary": 114801,
+      "skills": {
+        "client_acquisition": 0.65,
+        "enterprise_sales": 0.72,
+        "communication": 0.62
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0016",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0039",
+      "name": "Aarav Sharma",
+      "role": "Manager",
+      "department": "Sales",
+      "salary": 126009,
+      "skills": {
+        "enterprise_sales": 0.75,
+        "client_acquisition": 0.79,
+        "negotiation": 0.71
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0017",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0040",
+      "name": "Vivaan Smith",
+      "role": "Manager",
+      "department": "Sales",
+      "salary": 144664,
+      "skills": {
+        "negotiation": 0.93,
+        "enterprise_sales": 0.64,
+        "client_acquisition": 0.91
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0017",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0041",
+      "name": "Arjun Taylor",
+      "role": "Manager",
+      "department": "Sales",
+      "salary": 127332,
+      "skills": {
+        "negotiation": 0.7,
+        "communication": 0.81,
+        "enterprise_sales": 0.85
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0018",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0042",
+      "name": "Rohan Patel",
+      "role": "Manager",
+      "department": "Sales",
+      "salary": 123342,
+      "skills": {
+        "enterprise_sales": 0.69,
+        "communication": 0.92,
+        "client_acquisition": 0.62
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0018",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0043",
+      "name": "Kabir Davis",
+      "role": "Manager",
+      "department": "Operations",
+      "salary": 137759,
+      "skills": {
+        "delivery_management": 0.72,
+        "process_optimization": 0.65,
+        "vendor_management": 0.94
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0019",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0044",
+      "name": "Neha Moore",
+      "role": "Manager",
+      "department": "Operations",
+      "salary": 120589,
+      "skills": {
+        "vendor_management": 0.8,
+        "delivery_management": 0.64,
+        "process_optimization": 0.93
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0019",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0045",
+      "name": "Ananya Verma",
+      "role": "Manager",
+      "department": "Operations",
+      "salary": 119768,
+      "skills": {
+        "vendor_management": 0.8,
+        "process_optimization": 0.65,
+        "delivery_management": 0.64
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0020",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0046",
+      "name": "Priya Wilson",
+      "role": "Manager",
+      "department": "Operations",
+      "salary": 130202,
+      "skills": {
+        "delivery_management": 0.67,
+        "process_optimization": 0.69,
+        "vendor_management": 0.64
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0020",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0047",
+      "name": "Kavya Jackson",
+      "role": "Manager",
+      "department": "Operations",
+      "salary": 146692,
+      "skills": {
+        "delivery_management": 0.9,
+        "process_optimization": 0.94,
+        "vendor_management": 0.88
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0021",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0048",
+      "name": "Meera Singh",
+      "role": "Manager",
+      "department": "Operations",
+      "salary": 137020,
+      "skills": {
+        "process_optimization": 0.87,
+        "vendor_management": 0.74,
+        "delivery_management": 0.83
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0021",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0049",
+      "name": "Michael Garcia",
+      "role": "Manager",
+      "department": "Product",
+      "salary": 126263,
+      "skills": {
+        "stakeholder_alignment": 0.73,
+        "roadmap_planning": 0.61,
+        "analytics": 0.76
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0022",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0050",
+      "name": "Daniel Martin",
+      "role": "Manager",
+      "department": "Product",
+      "salary": 123079,
+      "skills": {
+        "stakeholder_alignment": 0.89,
+        "analytics": 0.9,
+        "roadmap_planning": 0.68
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0022",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0051",
+      "name": "Sophia Mehta",
+      "role": "Manager",
+      "department": "Product",
+      "salary": 122656,
+      "skills": {
+        "stakeholder_alignment": 0.9,
+        "analytics": 0.94,
+        "roadmap_planning": 0.7
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0023",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0052",
+      "name": "Olivia Martinez",
+      "role": "Manager",
+      "department": "Product",
+      "salary": 143384,
+      "skills": {
+        "stakeholder_alignment": 0.64,
+        "analytics": 0.94,
+        "roadmap_planning": 0.66
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0023",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0053",
+      "name": "Ethan Lee",
+      "role": "Manager",
+      "department": "Product",
+      "salary": 127397,
+      "skills": {
+        "roadmap_planning": 0.72,
+        "analytics": 0.88,
+        "stakeholder_alignment": 0.75
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0024",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0054",
+      "name": "Liam Johnson",
+      "role": "Manager",
+      "department": "Product",
+      "salary": 143516,
+      "skills": {
+        "roadmap_planning": 0.69,
+        "stakeholder_alignment": 0.85,
+        "analytics": 0.6
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0024",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0055",
+      "name": "Emma Anderson",
+      "role": "Manager",
+      "department": "Finance",
+      "salary": 145287,
+      "skills": {
+        "forecasting": 0.75,
+        "financial_modeling": 0.93,
+        "budgeting": 0.92
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0025",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0056",
+      "name": "Ava Perez",
+      "role": "Manager",
+      "department": "Finance",
+      "salary": 130572,
+      "skills": {
+        "forecasting": 0.78,
+        "financial_modeling": 0.83,
+        "budgeting": 0.71
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0025",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0057",
+      "name": "Noah Brown",
+      "role": "Manager",
+      "department": "Finance",
+      "salary": 129376,
+      "skills": {
+        "forecasting": 0.75,
+        "financial_modeling": 0.93,
+        "budgeting": 0.84
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0026",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0058",
+      "name": "Lucas Thomas",
+      "role": "Manager",
+      "department": "Finance",
+      "salary": 121405,
+      "skills": {
+        "forecasting": 0.79,
+        "budgeting": 0.6,
+        "financial_modeling": 0.7
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0026",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0059",
+      "name": "Isabella Sharma",
+      "role": "Manager",
+      "department": "Finance",
+      "salary": 138173,
+      "skills": {
+        "forecasting": 0.75,
+        "budgeting": 0.84,
+        "financial_modeling": 0.78
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0027",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0060",
+      "name": "Mason Smith",
+      "role": "Manager",
+      "department": "Finance",
+      "salary": 121120,
+      "skills": {
+        "forecasting": 0.78,
+        "financial_modeling": 0.82,
+        "budgeting": 0.72
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0027",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0061",
+      "name": "Logan Taylor",
+      "role": "Manager",
+      "department": "HR",
+      "salary": 125392,
+      "skills": {
+        "performance_management": 0.88,
+        "talent_acquisition": 0.65
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0028",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0062",
+      "name": "Amelia Patel",
+      "role": "Manager",
+      "department": "HR",
+      "salary": 113028,
+      "skills": {
+        "talent_acquisition": 0.81,
+        "performance_management": 0.87
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0028",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0063",
+      "name": "Elijah Davis",
+      "role": "Manager",
+      "department": "HR",
+      "salary": 139846,
+      "skills": {
+        "performance_management": 0.85,
+        "talent_acquisition": 0.73
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0029",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0064",
+      "name": "James Moore",
+      "role": "Manager",
+      "department": "HR",
+      "salary": 136191,
+      "skills": {
+        "talent_acquisition": 0.83,
+        "performance_management": 0.6
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0029",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0065",
+      "name": "Charlotte Verma",
+      "role": "Manager",
+      "department": "HR",
+      "salary": 116985,
+      "skills": {
+        "performance_management": 0.66,
+        "talent_acquisition": 0.94
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0030",
+      "productivity_multiplier": 1.0
+    },
+    {
+      "id": "EMP0066",
+      "name": "Benjamin Wilson",
+      "role": "Manager",
+      "department": "HR",
+      "salary": 143944,
+      "skills": {
+        "performance_management": 0.8,
+        "talent_acquisition": 0.92
+      },
+      "capacity_hours_per_week": 40,
+      "reports_to": "EMP0030",
+      "productivity_multiplier": 1.0
+    }
+  ]
+}
