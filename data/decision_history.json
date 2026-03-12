@@ -157,5 +157,16 @@
     ],
     "model_version": "v3.0",
     "persisted_at": "2026-02-28T18:34:42.381985+00:00"
+  },
+  {
+    "employee_id": "EMP0001",
+    "best_strategy": "no_replace",
+    "strategies_evaluated": [
+      "no_replace",
+      "immediate",
+      "delayed"
+    ],
+    "model_version": "v3.0",
+    "persisted_at": "2026-03-06T05:11:33.275912+00:00"
   }
 ]

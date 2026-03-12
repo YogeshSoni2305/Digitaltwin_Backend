@@ -19,9 +19,15 @@ API Reference:
 """
 
 import os
+import math
 import json
 import logging
 import time
+from dotenv import load_dotenv
+
+# Load environment variables before any other imports that might depend on them
+load_dotenv()
+
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Any
 from fastapi import FastAPI, BackgroundTasks, HTTPException
@@ -66,6 +72,10 @@ class SimulationRequest(BaseModel):
     strategy: StrategyType = StrategyType.BASELINE
     seed: Optional[int] = 42
     shock_test: bool = False
+    # Expansion parameters
+    price_delta: Optional[float] = 0.1
+    churn_impact: Optional[float] = 0.2
+    restructure_intensity: Optional[float] = 0.5
 
 class DecisionRequest(BaseModel):
     employee_id: str
@@ -114,16 +124,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-        "http://localhost:8081",
-        "http://127.0.0.1:8081",
-        "http://192.168.45.100:8080",
-
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -414,64 +415,75 @@ def explain_decision(request: DecisionRequest):
 @app.get("/predict/attrition")
 def predict_attrition(seed: int = 42):
     """
-    Deterministic attrition probability modeling based on structural metrics.
+    Deterministic attrition probability modeling using sigmoid transform.
+
+    Fix 3: Replaced linear formula (narrow 0.41-0.56 band) with the same
+    sigmoid model used in behavioral.py:
+        z = 1.8*burnout + 1.2*centrality + 0.9*scarcity - 1.5
+        P_exit = sigmoid(z)
     """
     import random
     rng = random.Random(seed)
-    
+
     results = []
     for emp in STATE["employees"]:
-        # Formula: 0.3*fragility + 0.2*utilization + 0.2*centrality + 0.2*burnout + 0.1*noise
-        fragility = getattr(emp, 'fragility', 0.3)
-        centrality = getattr(emp, 'centrality', 0.5)
-        # Mocking utilization/burnout for this phase
-        utilization = 0.7 + (rng.random() * 0.3)
-        burnout = 0.2 + (rng.random() * 0.4)
-        
-        prob = (0.3 * fragility) + (0.2 * utilization) + (0.2 * centrality) + (0.2 * burnout) + (0.1 * rng.random())
-        prob = min(max(prob, 0.0), 1.0)
-        
+        # Simulate per-employee burnout/centrality/scarcity with seeded noise
+        utilization = 0.7 + (rng.random() * 0.3)   # [0.70, 1.00]
+        burnout      = min(1.0, utilization + (rng.random() * 0.2 - 0.1))  # contagion-shifted
+        centrality   = rng.random() * 0.4            # [0.0, 0.4] – sparse in most orgs
+        scarcity     = 0.3 + rng.random() * 0.5      # [0.3, 0.8] – 1/redundancy proxy
+
+        # Sigmoid transform (same calibration as behavioral.py)
+        z    = 1.8 * burnout + 1.2 * centrality + 0.9 * scarcity - 1.5
+        prob = 1.0 / (1.0 + math.exp(-max(-50.0, min(50.0, z))))
+        prob = round(max(0.0, min(1.0, prob)), 2)
+
         band = "LOW"
-        if prob > 0.7: band = "CRITICAL"
-        elif prob > 0.5: band = "HIGH"
-        elif prob > 0.3: band = "MEDIUM"
-        
+        if prob > 0.70:   band = "CRITICAL"
+        elif prob > 0.50: band = "HIGH"
+        elif prob > 0.30: band = "MEDIUM"
+
         results.append({
             "employee_id": emp.id,
-            "name": emp.name,
-            "probability": round(prob, 2),
-            "risk_band": band
+            "name":        emp.name,
+            "probability": prob,
+            "risk_band":   band,
         })
-    
+
     return {"employees": sorted(results, key=lambda x: x["probability"], reverse=True)}
 
 @app.post("/predict/hiring-impact")
 def predict_hiring_impact(request: HiringRequest):
     """
     Simulates productivity and revenue recovery for new hires.
+
+    Fix 4: Replaced linear ramp with a logistic S-curve for realistic onboarding:
+        productivity(t) = 1 / (1 + e^(-k * (t - midpoint)))
+        k = 0.8, midpoint = hiring_delay_weeks / 2
     """
+    _k = 0.8
+    ramp_up_weeks = max(request.hiring_delay_weeks, 1)  # use delay as ramp duration
+    midpoint = ramp_up_weeks / 2.0
+
     timeline = []
-    base_productivity = 0.0
-    for week in range(1, 25): # 6 month forecast
-        # Hiring delay
+    for week in range(1, 25):  # 6-month (24-week) forecast
         current_productivity = 0.0
         if week > request.hiring_delay_weeks:
-            # Ramp up logic
             weeks_active = week - request.hiring_delay_weeks
-            # Logistic ramp up or linear? Let's go with linear ramp up to 1.0 over 12 weeks
-            ramp_factor = min(1.0, request.ramp_up_curve + (weeks_active * 0.05))
+            # Logistic onboarding S-curve
+            ramp_factor = 1.0 / (1.0 + math.exp(-_k * (weeks_active - midpoint)))
             current_productivity = ramp_factor * len(request.target_roles)
-        
+
         timeline.append({
             "week": week,
-            "productivity": round(current_productivity, 2),
-            "revenue_recovery": round(current_productivity * 15000, 2) # Est $15k/week per unit
+            "productivity": round(current_productivity, 3),
+            "revenue_recovery": round(current_productivity * 15000, 2),
         })
-    
+
     return {
         "roles": request.target_roles,
         "timeline": timeline,
-        "total_recovery_projection": sum(t["revenue_recovery"] for t in timeline)
+        "total_recovery_projection": round(sum(t["revenue_recovery"] for t in timeline), 2),
     }
 
 @app.post("/predict/trajectory")
@@ -519,79 +531,172 @@ def predict_trajectory(request: TrajectoryRequest):
 @app.post("/portfolio/simulate")
 def simulate_portfolio(request: PortfolioRequest):
     """
-    Simulates multi-project interactions and resource conflicts.
+    Simulates multi-project interactions, resource contention, and scheduling conflicts.
+
+    Fix 8: Added conflict-density model with queue-delay probability and cross-project
+    scheduling conflict signal.
+
+        D = project_count * 0.15          (base conflict density)
+        P_delay = min(1.0, D * 0.8)       (probability any given week sees a delay)
+        avg_delay_weeks = D * 2.5         (expected queue-delay overhead)
+
+    Per-week density incorporates a sinusoidal sprint-cycle variance to model
+    realistic resource contention peaks.
     """
-    # Logic: More projects = higher conflict heatmap density
-    conflict_density = len(request.project_ids) * 0.15
+    import random as _random
+    rng = _random.Random(request.seed or 42)
+
+    n_projects = max(1, len(request.project_ids))
+    conflict_density = n_projects * 0.15          # D
+    p_delay          = min(1.0, conflict_density * 0.8)
+    avg_delay_weeks  = round(conflict_density * 2.5, 2)
+
+    # Revenue estimate: each project contributes, but contention reduces total yield
+    contention_penalty = 1.0 - (conflict_density * 0.1)
+    portfolio_revenue  = round(500_000.0 * n_projects * max(0.5, contention_penalty), 2)
+
+    # Per-week conflict heatmap with sprint-cycle variance
+    heatmap = []
+    for w in range(1, 13):
+        # Sprint peaks every 4 weeks; add stochastic noise per-week
+        sprint_cycle  = 1.0 + 0.25 * math.sin(math.pi * w / 2)
+        weekly_noise  = 1.0 + (rng.random() - 0.5) * 0.1
+        density_w     = min(1.0, conflict_density * sprint_cycle * weekly_noise)
+        delay_prob_w  = min(1.0, p_delay * sprint_cycle)
+        heatmap.append({
+            "week":         w,
+            "density":      round(density_w, 3),
+            "delay_prob":   round(delay_prob_w, 3),
+        })
+
     return {
-        "portfolio_revenue": 500000 * len(request.project_ids) * 0.9,
-        "delay_exposure": round(conflict_density * 10, 2),
-        "conflict_heatmap": [
-            {"week": w, "density": round(min(1.0, conflict_density * (1 + 0.2 * (w % 4))), 2)} 
-            for w in range(1, 13)
-        ]
+        "portfolio_revenue":  portfolio_revenue,
+        "delay_exposure":     round(conflict_density * 10, 2),
+        "avg_queue_delay_weeks": avg_delay_weeks,
+        "delay_probability": round(p_delay, 3),
+        "conflict_heatmap":  heatmap,
+        "projects_evaluated": n_projects,
     }
 
 @app.post("/budget/allocate")
 def allocate_budget(request: BudgetRequest):
     """
     Simulates financial and risk impact of budget shifts.
+
+    Fix 5: Replaced linear scaling (delta * 1.5) with log-based diminishing returns:
+        rev_change = log(1 + |ratio|) * 150, capped at ±30%
+    This prevents unrealistic jumps (10% budget → 15% revenue).
+
+    Fix 6 (stability): Clamped training stability gain to [0, 0.08].
     """
-    # Base Deltas
-    rev_change = request.adjustment_percent * 1.5
-    stab_change = request.training_investment * 0.2
-    
+    investment_ratio = request.adjustment_percent / 100.0
+    sign = 1.0 if investment_ratio >= 0 else -1.0
+    # Diminishing returns: log(1 + |ratio|) * 50
+    # At 10% input: log(1.1) * 50 ≈ 4.76%  (realistic, not 15%)
+    # At 50% input: log(1.5) * 50 ≈ 20.3%  (still capped at 30%)
+    rev_change = sign * math.log(1.0 + abs(investment_ratio)) * 50.0
+    # Cap within realistic bounds: ±30%
+    rev_change = max(-30.0, min(30.0, rev_change))
+
+    # Training stability gain with realistic cap
+    stab_change = min(0.08, request.training_investment * 0.08)
+
     if request.hiring_freeze:
-        rev_change -= 5.0
-        stab_change -= 0.1
-        
+        rev_change = max(-30.0, rev_change - 3.0)
+        stab_change = max(0.0, stab_change - 0.02)
+
+    base_run_rate = 500000.0
+    new_run_rate = base_run_rate * (1.0 + rev_change / 100.0)
+
     return {
         "revenue_delta_percent": round(rev_change, 2),
-        "stability_delta": round(stab_change, 2),
-        "attrition_delta": round(-stab_change * 0.5, 2),
+        "stability_delta":       round(stab_change, 3),
+        "attrition_delta":       round(-stab_change * 0.5, 3),
         "financial_summary": {
-            "new_run_rate": 500000 * (1 + rev_change/100),
-            "efficiency_gain": round(request.training_investment * 10, 2)
-        }
+            "new_run_rate":    round(max(0.0, new_run_rate), 2),
+            "efficiency_gain": round(request.training_investment * 8.0, 2),
+        },
     }
 
 @app.post("/strategy/investment")
 def strategic_investment(request: InvestmentRequest):
     """
     Models impact of training, automation, or redundancy investments.
+
+    Fix 6: Clamped fragility_delta ∈ [-0.15, -0.02] and stability_delta ∈ [0.01, 0.08].
+    Raw investment effects used log-scale diminishing returns before clamping.
     """
+    # Per-type base rates (fraction per $100k invested)
     impact = {
-        "training": {"fragility_reduction": 0.15, "stability_gain": 0.1},
-        "automation": {"dependency_reduction": 0.2, "fragility_reduction": 0.05},
-        "redundancy": {"stability_gain": 0.25, "fragility_reduction": 0.1}
+        "training":    {"fragility_reduction": 0.06, "stability_gain": 0.04},
+        "automation":  {"fragility_reduction": 0.04, "stability_gain": 0.02},
+        "redundancy":  {"fragility_reduction": 0.05, "stability_gain": 0.05},
     }
-    
-    selected = impact.get(request.type, {"fragility_reduction": 0, "stability_gain": 0})
+
+    selected = impact.get(request.type, {"fragility_reduction": 0.03, "stability_gain": 0.02})
+
+    # Diminishing returns: log-scale investment effect
+    investment_units = math.log(1.0 + max(0.0, request.amount) / 100_000.0)
+
+    raw_fragility_delta = -selected["fragility_reduction"] * investment_units
+    raw_stability_delta  =  selected["stability_gain"]     * investment_units
+
+    # Clamp to specified bounds (Fix 6)
+    fragility_delta = max(-0.15, min(-0.02, raw_fragility_delta))
+    stability_delta  = max(0.01,  min(0.08,   raw_stability_delta))
+
     return {
         "type": request.type,
+        "investment_amount": request.amount,
         "metrics": {
-            "fragility_delta": -selected["fragility_reduction"] * (request.amount / 100000),
-            "stability_delta": selected["stability_gain"] * (request.amount / 100000)
-        }
+            "fragility_delta": round(fragility_delta, 4),
+            "stability_delta":  round(stability_delta,  4),
+        },
     }
 
 @app.post("/strategy/merge")
 def strategy_merge(request: MergeRequest):
     """
     M&A scenario modeling for organizational merging.
+
+    Fix 7: Validates `other_org_data.employees`.
+      - Accepts a list  → counts the items directly.
+      - Accepts an int  → treated as employee count (converted to synthetic placeholders).
+      - Missing key     → defaults to 0.
     """
-    other_emp_count = len(request.other_org_data.get("employees", []))
+    emp_field = request.other_org_data.get("employees", 0)
+
+    if isinstance(emp_field, int):
+        # Integer count → synthetic employee count
+        other_emp_count = max(0, emp_field)
+    elif isinstance(emp_field, list):
+        other_emp_count = len(emp_field)
+    else:
+        # Unexpected type – default safe
+        other_emp_count = 0
+
     base_emp_count = len(STATE["employees"])
-    
-    # Synergies vs Friction
-    synergy = (other_emp_count + base_emp_count) * 0.05
-    friction = 0.2 if request.merge_type == "aggressive" else 0.1
-    
+    total_emp_count = base_emp_count + other_emp_count
+
+    # Friction coefficients per merge strategy
+    friction_map = {"aggressive": 0.25, "gradual": 0.10, "selective": 0.15}
+    friction = friction_map.get(request.merge_type, 0.15)
+
+    # Synergy grows sub-linearly with headcount (diminishing returns)
+    synergy = math.log(1.0 + total_emp_count) * 0.05
+
+    combined_fragility = min(1.0, 0.35 + friction)
+    stability_score    = max(0.0, 0.75 - friction)
+    revenue_projection = 1_000_000.0 + (synergy * 200_000.0)
+    overlap_count      = int(total_emp_count * 0.12)
+
     return {
-        "combined_fragility": round(0.4 + friction, 2),
-        "revenue_projection": 1000000 + (synergy * 50000),
-        "stability_score": round(0.7 - friction, 2),
-        "overlap_count": int((base_emp_count + other_emp_count) * 0.15)
+        "combined_fragility":  round(combined_fragility, 2),
+        "revenue_projection":  round(revenue_projection, 2),
+        "stability_score":     round(stability_score, 2),
+        "overlap_count":       overlap_count,
+        "other_employee_count": other_emp_count,
+        "merge_type":          request.merge_type,
     }
 
 

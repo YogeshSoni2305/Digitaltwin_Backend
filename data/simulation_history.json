@@ -538,5 +538,69 @@
     "stability": 0.0,
     "model_version": "v3.0",
     "persisted_at": "2026-02-28T18:34:42.381018+00:00"
+  },
+  {
+    "strategy": "baseline",
+    "employee_id": null,
+    "profit": 80180.5,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-03-06T05:10:55.979013+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0001",
+    "profit": 80180.5,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-03-06T05:11:07.017099+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0001",
+    "profit": 80180.5,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-03-06T05:11:20.302492+00:00"
+  },
+  {
+    "strategy": "no_replace",
+    "employee_id": "EMP0001",
+    "profit": 80180.5,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-03-06T05:11:33.241889+00:00"
+  },
+  {
+    "strategy": "immediate",
+    "employee_id": "EMP0001",
+    "profit": 80180.5,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-03-06T05:11:33.258550+00:00"
+  },
+  {
+    "strategy": "delayed",
+    "employee_id": "EMP0001",
+    "profit": -178055.46,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-03-06T05:11:33.275310+00:00"
+  },
+  {
+    "strategy": "price_increase",
+    "employee_id": null,
+    "profit": 80180.5,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-03-06T05:13:51.343620+00:00"
+  },
+  {
+    "strategy": "restructure",
+    "employee_id": null,
+    "profit": 80180.5,
+    "stability": 0.0,
+    "model_version": "v3.0",
+    "persisted_at": "2026-03-06T05:13:51.373547+00:00"
   }
 ]

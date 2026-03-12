@@ -82,19 +82,33 @@ def compute_structural_fragility(employees: List[Employee]) -> Dict[str, Any]:
     if structure_digest in _STRUCTURAL_METRICS_CACHE:
         return _STRUCTURAL_METRICS_CACHE[structure_digest]
 
-    # 1. Network Centralization (30% weight)
-    # Analyzes who sits on the most communication paths
+    # 1. Network Analysis (Centralization + Influence)
     reporting_graph = nx.Graph()
     for emp in employees:
         reporting_graph.add_node(emp.id)
         if emp.reports_to:
             reporting_graph.add_edge(emp.reports_to, emp.id)
     
+    # 1a. Betweenness Centrality (Communications path)
     centrality_map = nx.betweenness_centrality(reporting_graph)
     max_centralization = max(centrality_map.values()) if centrality_map else 0.0
 
-    # 2. Skill Concentration (30% weight)
-    # Measures risk of "Single Points of Failure" for specific skills
+    # 1b. Eigenvector Centrality (Influence of influence)
+    try:
+        # Use numpy implementation for better performance/stability if available
+        eigen_map = nx.eigenvector_centrality_numpy(reporting_graph) if len(employees) > 1 else {emp.id: 1.0 for emp in employees}
+        max_influence = max(eigen_map.values()) if eigen_map else 0.0
+    except Exception:
+        max_influence = 0.0 # Fallback for disconnected/singular graphs
+
+    # 1c. Clustering Coefficient (Local cohesion)
+    avg_clustering = nx.average_clustering(reporting_graph) if len(employees) > 2 else 0.0
+    
+    # 1d. Connected Components (Organizational Silos)
+    num_silos = nx.number_connected_components(reporting_graph)
+    silo_risk = (num_silos - 1) / len(employees) if len(employees) > 1 else 0.0
+
+    # 2. Skill Concentration (25% weight)
     skill_redundancy_map = compute_skill_redundancy(employees)
     if not skill_redundancy_map:
         skill_concentration_index = 0.0
@@ -102,25 +116,25 @@ def compute_structural_fragility(employees: List[Employee]) -> Dict[str, Any]:
         critical_skills_count = len([s for s, count in skill_redundancy_map.items() if count <= 1])
         skill_concentration_index = critical_skills_count / len(skill_redundancy_map)
 
-    # 3. Span-of-Control Risk (20% weight)
-    # Measures if managers are overloaded (affecting decision quality)
+    # 3. Span-of-Control Risk (15% weight)
     management_hierarchy = build_reporting_map(employees)
     total_management_nodes = len(management_hierarchy)
     violations = validate_span_of_control(employees)
     span_risk_index = len(violations) / total_management_nodes if total_management_nodes > 0 else 0.0
 
-    # 4. Critical Dependency (20% weight)
-    # Measures the concentration of influence in the top 10% of the network
+    # 4. Critical Dependency (influence in top 10%)
     all_centrality_values = sorted(centrality_map.values(), reverse=True)
     top_tier_count = max(1, int(len(employees) * 0.1))
     top_tier_centrality_avg = sum(all_centrality_values[:top_tier_count]) / top_tier_count if top_tier_count > 0 else 0.0
 
-    # Composite quantitative score (0-100)
+    # Composite quantitative score (0-100) - Rebalanced for new metrics
     aggregate_fragility_score = (
-        (max_centralization * 0.3) +
-        (skill_concentration_index * 0.3) +
-        (span_risk_index * 0.2) +
-        (top_tier_centrality_avg * 0.2)
+        (max_centralization * 0.20) +
+        (max_influence * 0.15) +
+        (skill_concentration_index * 0.25) +
+        (span_risk_index * 0.15) +
+        (top_tier_centrality_avg * 0.15) +
+        (silo_risk * 0.10)
     ) * 100.0
     
     final_score = round(min(aggregate_fragility_score, 100.0), 2)
@@ -134,6 +148,9 @@ def compute_structural_fragility(employees: List[Employee]) -> Dict[str, Any]:
         ),
         "components": {
             "centralization": round(max_centralization, 3),
+            "influence_concentration": round(max_influence, 3),
+            "clustering_cohesion": round(avg_clustering, 3),
+            "silo_score": round(silo_risk, 3),
             "skill_concentration": round(skill_concentration_index, 3),
             "span_risk": round(span_risk_index, 3),
             "critical_dependency": round(top_tier_centrality_avg, 3)

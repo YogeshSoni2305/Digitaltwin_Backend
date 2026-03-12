@@ -7,6 +7,8 @@ class StrategyType(str, Enum):
     NO_REPLACE = "no_replace"
     IMMEDIATE = "immediate"
     DELAYED = "delayed"
+    PRICE_INCREASE = "price_increase"
+    RESTRUCTURE = "restructure"
 
 
 class SimulationEngineError(Exception):
