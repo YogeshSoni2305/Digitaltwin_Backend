@@ -21,7 +21,11 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 
 # Internal Imports
-from core.models import Employee, ExecutionProject, StrategyType, SimulationEngineError
+from core.settings import settings
+from core.models import (
+    Employee, ExecutionProject, StrategyType, SimulationEngineError, 
+    ServiceResponse, RiskMetrics, OrganizationMetrics, GovernanceMetrics
+)
 from core.simulation.executor import simulate_project_execution
 from core.simulation.scheduler import (
     simulate_baseline,
@@ -106,7 +110,7 @@ def run_standard_simulation(
     shock_mode: bool = False,
     random_seed: Optional[int] = None,
     model_config: Dict[str, Any] = {},
-) -> Dict[str, Any]:
+) -> ServiceResponse:
     """
     Orchestrates a full simulation run including Monte Carlo and multi-layer risk analysis.
     """
@@ -123,9 +127,13 @@ def run_standard_simulation(
         model_config,
     )
 
+    # 1B. Isolate state explicitly before execution (Fix 1)
+    isolated_projects = [p.model_copy(deep=True) for p in projects]
+    isolated_employees = [e.model_copy(deep=True) for e in employees]
+
     # 2. Execution Logic Run
     try:
-        execution_result = selected_strategy_fn(projects, employees, **strategy_kwargs)
+        execution_result = selected_strategy_fn(isolated_projects, isolated_employees, **strategy_kwargs)
         if execution_result is None:
             raise SimulationEngineError(f"Strategy {strategy_key} returned None")
     except Exception as e:
@@ -135,35 +143,38 @@ def run_standard_simulation(
 
     # 3. Stochastic Risk Analysis (Monte Carlo)
     noise_config = model_config.get("noise_parameters")
+    requested_iterations = model_config.get("mc_iterations", 30)
+    safe_iterations = min(requested_iterations, settings.MAX_MC_ITERATIONS)
+    
     mc_stats = run_monte_carlo_simulation(
-        projects,
-        employees,
+        isolated_projects,
+        isolated_employees,
         selected_strategy_fn,
         strategy_kwargs=strategy_kwargs,
-        iteration_count=30,
+        iteration_count=safe_iterations,
         master_seed=random_seed,
         noise_params=noise_config,
     )
 
-    # 4. Financial Post-Processing (BUG-9 FIX: pass per-project completion times)
+    # 4. Financial Post-Processing
     finance_metrics = compute_profit(
-        projects,
-        employees,
-        execution_result["duration_weeks"],
-        project_completion_times=execution_result.get("project_completion_times"),
+        isolated_projects,
+        isolated_employees,
+        execution_result.duration_weeks,
+        project_completion_times=execution_result.project_completion_times,
     )
 
     # 5. Organisational Health & Structural Risk
-    redundancy_map = compute_skill_redundancy(employees)
+    redundancy_map = compute_skill_redundancy(isolated_employees)
     health_score   = compute_aggregate_org_health(
-        validate_span_of_control(employees),
+        validate_span_of_control(isolated_employees),
         redundancy_map,
     )
-    structural_risk = compute_structural_fragility(employees)
+    structural_risk = compute_structural_fragility(isolated_employees)
 
     # 6. Behavioral Risk & Network Contagion
     reporting_net = nx.Graph()
-    for e in employees:
+    for e in isolated_employees:
         reporting_net.add_node(e.id)
         if e.reports_to:
             reporting_net.add_edge(e.reports_to, e.id)
@@ -171,51 +182,51 @@ def run_standard_simulation(
     centrality_map = nx.betweenness_centrality(reporting_net)
 
     # Shock Top 20% central hubs if shock mode active
-    effective_utilization = dict(execution_result.get("utilization", {}))
+    effective_utilization = dict(execution_result.utilization)
     if shock_mode:
         sorted_hubs = sorted(centrality_map.items(), key=lambda x: x[1], reverse=True)
-        top_hubs_count = max(1, int(len(employees) * 0.2))
+        top_hubs_count = max(1, int(len(isolated_employees) * 0.2))
         for node_id, _ in sorted_hubs[:top_hubs_count]:
             if node_id in effective_utilization:
                 effective_utilization[node_id] = min(1.0, effective_utilization[node_id] + 0.2)
 
     behavioral_risk = compute_behavioral_fragility(
-        employees, reporting_net, effective_utilization, centrality_map, redundancy_map
+        isolated_employees, reporting_net, effective_utilization, centrality_map, redundancy_map
     )
 
     # 7. Final Response Assembly
-    service_response = {
-        "execution": execution_result,
-        "financial": finance_metrics,
-        "risk": {
-            "average_profit":              mc_stats["mean_profit"],
-            "p5_profit":                   mc_stats["p5_profit"],
-            "p95_profit":                  mc_stats["p95_profit"],
-            "profit_variance":             mc_stats["profit_variance"],
-            "stability_score":             mc_stats["stability_score"],
-            "risk_probability":            mc_stats.get("probability_of_loss", 0.0),
-            "mean_structural_fragility":   mc_stats.get("mean_structural_fragility", structural_risk["fragility_score"]),
-            "mean_behavioral_fragility":   mc_stats.get("mean_behavioral_fragility", behavioral_risk["behavioral_fragility_index"]),
-            "seed_used":                   mc_stats["seed_used"],
-        },
-        "organization": {
-            "health_score":                  health_score,
-            "structural_fragility_score":    structural_risk["fragility_score"],
-            "behavioral_fragility_index":    behavioral_risk["behavioral_fragility_index"],
-            "risk_level":                    structural_risk["risk_level"],
-        },
-        "governance": {
-            "model_version": model_config.get("model_version"),
-            "timestamp":     datetime.now(timezone.utc).isoformat(),
-        },
-    }
+    service_response = ServiceResponse(
+        execution=execution_result,
+        financial=finance_metrics,
+        risk=RiskMetrics(
+            average_profit=mc_stats.mean_profit,
+            p5_profit=mc_stats.p5_profit,
+            p95_profit=mc_stats.p95_profit,
+            profit_variance=mc_stats.profit_variance,
+            stability_score=mc_stats.stability_score,
+            risk_probability=mc_stats.probability_of_loss,
+            mean_structural_fragility=mc_stats.mean_structural_fragility if mc_stats.mean_structural_fragility > 0 else structural_risk.fragility_score,
+            mean_behavioral_fragility=mc_stats.mean_behavioral_fragility if mc_stats.mean_behavioral_fragility > 0 else behavioral_risk.behavioral_fragility_index,
+            seed_used=mc_stats.seed_used,
+        ),
+        organization=OrganizationMetrics(
+            health_score=health_score,
+            structural_fragility_score=structural_risk.fragility_score,
+            behavioral_fragility_index=behavioral_risk.behavioral_fragility_index,
+            risk_level=structural_risk.risk_level,
+        ),
+        governance=GovernanceMetrics(
+            model_version=model_config.get("model_version"),
+            timestamp=datetime.now(timezone.utc).isoformat(),
+        ),
+    )
 
     # 8. Persistence Audit
     log_simulation_history({
         "strategy":      strategy_key,
         "employee_id":   target_employee_id,
-        "profit":        mc_stats["mean_profit"],
-        "stability":     mc_stats["stability_score"],
+        "profit":        mc_stats.mean_profit,
+        "stability":     mc_stats.stability_score,
         "model_version": model_config.get("model_version"),
     })
 

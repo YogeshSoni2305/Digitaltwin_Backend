@@ -17,7 +17,7 @@ import math
 import random
 from copy import deepcopy
 from typing import List, Dict, Any, Optional
-from core.models import Employee, ExecutionProject, SimulationEngineError
+from core.models import Employee, ExecutionProject, SimulationEngineError, SimulationResult
 from core.simulation.executor import simulate_project_execution
 
 # Business Constants
@@ -50,7 +50,7 @@ def simulate_baseline(
     employees: List[Employee],
     *args,
     **kwargs,
-) -> Dict[str, Any]:
+) -> SimulationResult:
     """
     Standard baseline simulation with the current team.
     No modifications — serves as the control scenario.
@@ -63,7 +63,7 @@ def simulate_no_replacement(
     employees: List[Employee],
     removed_employee_id: str = "",
     **kwargs,
-) -> Dict[str, Any]:
+) -> SimulationResult:
     """
     Simulates the impact of removing an employee without hiring a replacement.
 
@@ -73,7 +73,7 @@ def simulate_no_replacement(
         removed_employee_id: ID of the employee to be removed.
 
     Returns:
-        Dict[str, Any]: Simulation results for the reduced team.
+        SimulationResult: Simulation results for the reduced team.
     """
     remaining_employees = [e for e in employees if e.id != removed_employee_id]
     return simulate_project_execution(projects, remaining_employees)
@@ -85,7 +85,7 @@ def simulate_immediate_replacement(
     removed_employee_id: str = "",
     ramp_up_weeks: float = 12.0,
     **kwargs,
-) -> Dict[str, Any]:
+) -> SimulationResult:
     """
     Simulates an immediate replacement hire with a logistic productivity ramp-up.
 
@@ -99,7 +99,7 @@ def simulate_immediate_replacement(
         ramp_up_weeks: Total weeks to reach full productivity (default 12 weeks / 3 months).
 
     Returns:
-        Dict[str, Any]: Simulation results with the new hire included.
+        SimulationResult: Simulation results with the new hire included.
     """
     remaining_employees = [e for e in employees if e.id != removed_employee_id]
 
@@ -130,7 +130,7 @@ def simulate_delayed_replacement(
     hiring_delay_weeks: int = DEFAULT_HIRING_DELAY_WEEKS,
     ramp_up_weeks: float = 12.0,
     **kwargs,
-) -> Dict[str, Any]:
+) -> SimulationResult:
     """
     Simulates a hiring delay followed by a replacement with a logistic ramp.
 
@@ -173,9 +173,9 @@ def simulate_delayed_replacement(
     
     # Duration = (Speed with hire) + (Delay overhead)
     # We take the duration with the hire and add the hiring delay where nobody was in that seat.
-    final_duration = round(with_hire_result["duration_weeks"] + hiring_delay_weeks, 2)
+    final_duration = round(with_hire_result.duration_weeks + hiring_delay_weeks, 2)
     
-    with_hire_result["duration_weeks"] = final_duration
+    with_hire_result.duration_weeks = final_duration
     return with_hire_result
 
 
@@ -185,7 +185,7 @@ def simulate_price_increase(
     price_delta: float = 0.1,
     churn_impact: float = 0.2,
     **kwargs,
-) -> Dict[str, Any]:
+) -> SimulationResult:
     """
     Simulates a price increase event.
 
@@ -212,7 +212,7 @@ def simulate_restructure(
     restructure_intensity: float = 0.5,
     seed: Optional[int] = None,
     **kwargs,
-) -> Dict[str, Any]:
+) -> SimulationResult:
     """
     Simulates a team restructuring event.
 

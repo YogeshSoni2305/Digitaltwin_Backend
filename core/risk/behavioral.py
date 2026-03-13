@@ -18,7 +18,7 @@ External Dependencies:
 import math
 import networkx as nx
 from typing import List, Dict, Any, Optional
-from core.models import Employee
+from core.models import Employee, BehavioralRiskResult
 
 # Business Constants: Contagion & Attrition
 CONTAGION_FACTOR_DEFAULT = 0.3
@@ -144,7 +144,7 @@ def compute_behavioral_fragility(
     utilization_matrix: Dict[str, float],
     centrality_matrix: Dict[str, float],
     redundancy_matrix: Dict[str, float],
-) -> Dict[str, Any]:
+) -> BehavioralRiskResult:
     """
     Aggregates granular behavioral signals into a high-level organizational index.
 
@@ -152,12 +152,12 @@ def compute_behavioral_fragility(
         Dict[str, Any]: Behavioral analytics including the fragility index.
     """
     if not employees:
-        return {
-            "behavioral_fragility_index": 0.0,
-            "average_attrition_probability": 0.0,
-            "average_knowledge_loss_index": 0.0,
-            "burnout_map": {},
-        }
+        return BehavioralRiskResult(
+            behavioral_fragility_index=0.0,
+            average_attrition_probability=0.0,
+            average_knowledge_loss_index=0.0,
+            burnout_map={}
+        )
 
     burnout_map = compute_burnout_contagion(organizational_network, utilization_matrix)
 
@@ -188,12 +188,12 @@ def compute_behavioral_fragility(
     # Behavioral Fragility Index (0–100)
     fragility_index = (avg_attrition * 60) + (avg_loss * 40)
 
-    return {
-        "behavioral_fragility_index": round(fragility_index, 2),
-        "average_attrition_probability": round(avg_attrition, 3),
-        "average_knowledge_loss_index": round(avg_loss, 3),
-        "burnout_map": burnout_map,
-    }
+    return BehavioralRiskResult(
+        behavioral_fragility_index=round(fragility_index, 2),
+        average_attrition_probability=round(avg_attrition, 3),
+        average_knowledge_loss_index=round(avg_loss, 3),
+        burnout_map=burnout_map,
+    )
 
 
 # --- Legacy / Categorical Helpers ---

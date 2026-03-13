@@ -25,7 +25,7 @@ import networkx as nx
 import concurrent.futures
 import os
 from typing import List, Dict, Any, Optional, Callable
-from core.models import SimulationEngineError
+from core.models import SimulationEngineError, MonteCarloResult
 
 # Internal Imports
 from core.utils.finance import compute_profit
@@ -130,7 +130,7 @@ def run_monte_carlo_simulation(
     iteration_count: int = 50,
     master_seed: Optional[int] = None,
     noise_params: Optional[Dict[str, float]] = None,
-) -> Dict[str, Any]:
+) -> MonteCarloResult:
     """
     Orchestrates a parallel Monte Carlo simulation to evaluate strategy robustness.
 
@@ -154,7 +154,7 @@ def run_monte_carlo_simulation(
         noise_params: Stochastic variance configuration.
 
     Returns:
-        Dict[str, Any]: Statistical summary of the strategy's performance profile.
+        MonteCarloResult: Statistical summary of the strategy's performance profile.
     """
     if noise_params is None:
         noise_params = {
@@ -174,6 +174,18 @@ def run_monte_carlo_simulation(
     centrality_scores = nx.betweenness_centrality(net)
     redundancy_map = compute_skill_redundancy(employees)
     structural_analysis = compute_structural_fragility(employees)
+
+    # Prepare seeds and metrics collection
+    master_rng = random.Random(master_seed)
+    sub_seeds = [master_rng.randint(0, _SEED_RANGE) for _ in range(iteration_count)]
+
+    aggregated_metrics: Dict[str, List[float]] = {
+        "profit": [],
+        "duration_weeks": [],
+        "structural_fragility": [],
+        "behavioral_fragility": [],
+        "contagion_level": [],
+    }
 
     # ThreadPoolExecutor avoids multiprocessing pickle failures for locally
     # defined or lambda callables while still parallelising I/O.
@@ -256,4 +268,4 @@ def run_monte_carlo_simulation(
     summary_statistics["seed_used"] = master_seed
     summary_statistics["runs"] = iteration_count
 
-    return summary_statistics
+    return MonteCarloResult(**summary_statistics)

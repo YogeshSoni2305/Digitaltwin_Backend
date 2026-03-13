@@ -20,7 +20,7 @@ import networkx as nx
 import hashlib
 import json
 from typing import List, Dict, Any, Tuple
-from core.models import Employee
+from core.models import Employee, StructuralRiskResult, StructuralComponents
 from core.utils.structure import validate_span_of_control, build_reporting_map
 from core.utils.skills import compute_skill_redundancy
 
@@ -64,7 +64,7 @@ def _generate_organizational_digest(employees: List[Employee]) -> str:
     return hashlib.md5(canonical_repr.encode()).hexdigest()
 
 
-def compute_structural_fragility(employees: List[Employee]) -> Dict[str, Any]:
+def compute_structural_fragility(employees: List[Employee]) -> StructuralRiskResult:
     """
     Performs a full network analysis to determine the organization's Structural Fragility Score.
     Uses caching to avoid re-computing for identical structures.
@@ -73,19 +73,22 @@ def compute_structural_fragility(employees: List[Employee]) -> Dict[str, Any]:
         employees: List of employees to analyze.
         
     Returns:
-        Dict[str, Any]: Quantitative fragility score and categorical risk level.
+        StructuralRiskResult: Quantitative fragility score and categorical risk level.
     """
     if not employees:
-        return {
-            "fragility_score": 0.0,
-            "risk_level": "LOW",
-            "components": {
-                "centralization": 0.0, 
-                "skill_concentration": 0.0, 
-                "span_risk": 0.0, 
-                "critical_dependency": 0.0
-            }
-        }
+        return StructuralRiskResult(
+            fragility_score=0.0,
+            risk_level="LOW",
+            components=StructuralComponents(
+                centralization=0.0, 
+                influence_concentration=0.0,
+                clustering_cohesion=0.0,
+                silo_score=0.0,
+                skill_concentration=0.0, 
+                span_risk=0.0, 
+                critical_dependency=0.0
+            )
+        )
 
     structure_digest = _generate_organizational_digest(employees)
     
@@ -159,25 +162,26 @@ def compute_structural_fragility(employees: List[Employee]) -> Dict[str, Any]:
     
     final_score = round(min(aggregate_fragility_score, 100.0), 2)
 
-    risk_result = {
-        "fragility_score": final_score,
-        "risk_level": (
+    risk_result = StructuralRiskResult(
+        fragility_score=final_score,
+        risk_level=(
             "HIGH" if final_score > FRAGILITY_THRESHOLD_HIGH 
             else "MEDIUM" if final_score > FRAGILITY_THRESHOLD_MEDIUM 
             else "LOW"
         ),
-        "components": {
-            "centralization": round(max_centralization, 3),
-            "influence_concentration": round(max_influence, 3),
-            "clustering_cohesion": round(avg_clustering, 3),
-            "silo_score": round(silo_risk, 3),
-            "skill_concentration": round(skill_concentration_index, 3),
-            "span_risk": round(span_risk_index, 3),
-            "critical_dependency": round(top_tier_centrality_avg, 3)
-        }
-    }
+        components=StructuralComponents(
+            centralization=round(max_centralization, 3),
+            influence_concentration=round(max_influence, 3),
+            clustering_cohesion=round(avg_clustering, 3),
+            silo_score=round(silo_risk, 3),
+            skill_concentration=round(skill_concentration_index, 3),
+            span_risk=round(span_risk_index, 3),
+            critical_dependency=round(top_tier_centrality_avg, 3)
+        )
+    )
     
     # Bounded cache write — evict oldest entry if at capacity
     _maybe_evict_cache()
-    _STRUCTURAL_METRICS_CACHE[structure_digest] = risk_result
+    with _CACHE_LOCK:
+        _STRUCTURAL_METRICS_CACHE[structure_digest] = risk_result
     return risk_result

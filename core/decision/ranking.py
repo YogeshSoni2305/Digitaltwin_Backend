@@ -17,6 +17,7 @@ External Dependencies:
 """
 
 from typing import List, Dict, Any, Tuple
+from core.models import RankingEngineResult, RankedStrategy
 
 def normalize_metric(value: float, min_val: float, max_val: float, invert: bool = False) -> float:
     """
@@ -130,7 +131,7 @@ def detect_dominance_matrix(scenarios: List[Dict[str, Any]]) -> List[bool]:
 def rank_strategies(
     scenarios: List[Dict[str, Any]], 
     decision_weights: Dict[str, float]
-) -> Dict[str, Any]:
+) -> RankingEngineResult:
     """
     Ranks a set of simulated strategies and provides qualitative justification.
     
@@ -139,10 +140,10 @@ def rank_strategies(
         decision_weights: Configuration defining the priority of each metric.
         
     Returns:
-        Dict[str, Any]: Ranked list with detailed scoring and reasoning.
+        RankingEngineResult: Ranked list with detailed scoring and reasoning.
     """
     if not scenarios:
-        return {"ranked_strategies": [], "governance": {"status": "NO_DATA"}}
+        return RankingEngineResult(ranked_strategies=[], governance={"status": "NO_DATA"})
 
     dominance_indicators = detect_dominance_matrix(scenarios)
 
@@ -187,26 +188,27 @@ def rank_strategies(
         if scenario.get('behavioral_fragility_index', 0) > 60: 
             narrative_justification.append("CRITICAL: High risk of organizational burnout contagion.")
 
-        processed_rankings.append({
-            "strategy": scenario['strategy'],
-            "decision_score": composite_score,
-            "is_dominant": dominance_indicators[i],
-            "recommendation_justification": narrative_justification,
-            "raw_metrics": scenario
-        })
+        processed_rankings.append(RankedStrategy(
+            strategy=scenario['strategy'],
+            decision_score=composite_score,
+            is_dominant=dominance_indicators[i],
+            recommendation_justification=narrative_justification,
+            raw_metrics=scenario,
+            rank=-1
+        ))
 
     # Sort by aggregate utility
-    processed_rankings.sort(key=lambda x: x['decision_score'], reverse=True)
+    processed_rankings.sort(key=lambda x: x.decision_score, reverse=True)
     
     # Assign ordinal ranks
     for index, item in enumerate(processed_rankings):
-        item['rank'] = index + 1
+        item.rank = index + 1
 
-    return {
-        "ranked_strategies": processed_rankings,
-        "governance": {
+    return RankingEngineResult(
+        ranked_strategies=processed_rankings,
+        governance={
             "applied_weights": decision_weights,
             "stability_informed": True,
             "pareto_checked": True
         }
-    }
+    )

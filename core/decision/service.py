@@ -21,7 +21,9 @@ from core.models import (
     ExecutionProject, 
     StrategyType, 
     SimulationEngineError, 
-    DecisionEngineError
+    DecisionEngineError,
+    DecisionResult,
+    ExplanationResult
 )
 from core.simulation.service import run_standard_simulation
 from core.decision.ranking import rank_strategies
@@ -34,7 +36,7 @@ def compare_hr_strategies(
     target_employee_id: str,
     random_seed: Optional[int] = 42,
     model_config: Dict[str, Any] = {}
-) -> Dict[str, Any]:
+) -> DecisionResult:
     """
     Simulates a matrix of HR strategies and ranks them to find the optimal outcome.
     """
@@ -53,25 +55,22 @@ def compare_hr_strategies(
             projects, employees, strategy, target_employee_id, random_seed=random_seed, model_config=model_config
         )
 
-        org = simulation_data["organization"]
-        risk = simulation_data["risk"]
+        org = simulation_data.organization
+        risk = simulation_data.risk
 
         # FIX-1: Build canonical metric dict that matches ranking.py metric_keys exactly.
-        # Previously used organization.copy() which injected mismatched keys:
-        #   "health_score"             → ranking expects "org_health"
-        #   "structural_fragility_score" → ranking expects "fragility_score"
-        #   "risk_level"               → string, not numeric — unusable in MAUT
+        # Now using typed Pydantic accessors
         metrics = {
-            "profit":                    risk["average_profit"],
-            "volatility":                risk["profit_variance"],
-            "stability_score":           risk["stability_score"],
-            "org_health":                org["health_score"],               # canonical name
-            "fragility_score":           org["structural_fragility_score"],  # canonical name
-            "behavioral_fragility_index": org["behavioral_fragility_index"],
+            "profit":                    risk.average_profit,
+            "volatility":                risk.profit_variance,
+            "stability_score":           risk.stability_score,
+            "org_health":                org.health_score,               
+            "fragility_score":           org.structural_fragility_score,  
+            "behavioral_fragility_index": org.behavioral_fragility_index,
         }
 
         # Burnout concentration: fraction of team at HIGH or MEDIUM burnout
-        burnout_map = simulation_data["execution"]["burnout_risk"]
+        burnout_map = simulation_data.execution.burnout_risk
         burnout_concentration = (
             len([v for v in burnout_map.values() if v in ["HIGH", "MEDIUM"]]) / len(burnout_map)
             if burnout_map else 0.0
@@ -94,9 +93,7 @@ def compare_hr_strategies(
         raise DecisionEngineError(f"Ranking failure: {str(e)}")
     
     # Enrich result
-    best_strategy = decision_result["ranked_strategies"][0]["strategy"]
-    decision_result["best_strategy"] = best_strategy
-    decision_result["comparison_matrix"] = decision_result["ranked_strategies"]
+    best_strategy = decision_result.ranked_strategies[0].strategy
     
     # Audit Persistence
     log_decision_history({
@@ -106,7 +103,12 @@ def compare_hr_strategies(
         "model_version": model_config.get("model_version")
     })
     
-    return decision_result
+    return DecisionResult(
+        best_strategy=best_strategy,
+        comparison_matrix=decision_result.ranked_strategies,
+        ranked_strategies=decision_result.ranked_strategies,
+        governance=decision_result.governance
+    )
 
 
 def explain_strategic_decision(
@@ -115,7 +117,7 @@ def explain_strategic_decision(
     target_employee_id: str,
     random_seed: Optional[int] = 42,
     model_config: Dict[str, Any] = {}
-) -> Dict[str, Any]:
+) -> ExplanationResult:
     """
     Runs a full comparison and then generates a grounded LLM executive summary for the winner.
     """
@@ -124,10 +126,10 @@ def explain_strategic_decision(
         projects, employees, target_employee_id, random_seed, model_config
     )
     
-    best_strategy_name = comparison_results["best_strategy"]
+    best_strategy_name = comparison_results.best_strategy
     best_scenario_snapshot = next(
-        (s for s in comparison_results["comparison_matrix"] 
-        if s["strategy"] == best_strategy_name), None
+        (s for s in comparison_results.comparison_matrix 
+        if s.strategy == best_strategy_name), None
     )
     if not best_scenario_snapshot:
         raise DecisionEngineError(f"Best strategy {best_strategy_name} not found in comparison matrix")
@@ -135,15 +137,15 @@ def explain_strategic_decision(
     
     # 2. Invoke LLM Interpretation
     executive_narrative = interpret_simulation_outcome(
-        target_scenario_data=best_scenario_snapshot["raw_metrics"],
+        target_scenario_data=best_scenario_snapshot.raw_metrics,
         strategy_name=best_strategy_name,
         simulation_seed=random_seed or 0,
         engine_version=model_config.get("model_version", "v3.0")
     )
     
-    return {
-        "best_strategy": best_strategy_name,
-        "rankings": comparison_results["ranked_strategies"],
-        "executive_summary": executive_narrative,
-        "winning_data_snapshot": best_scenario_snapshot["raw_metrics"]
-    }
+    return ExplanationResult(
+        best_strategy=best_strategy_name,
+        rankings=comparison_results.ranked_strategies,
+        executive_summary=executive_narrative,
+        winning_data_snapshot=best_scenario_snapshot.raw_metrics
+    )

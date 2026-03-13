@@ -19,7 +19,7 @@ External Dependencies:
 import math
 import networkx as nx
 from typing import List, Dict, Optional, Any
-from core.models import Employee, ExecutionProject, ExecutionTask, SimulationEngineError
+from core.models import Employee, ExecutionProject, ExecutionTask, SimulationEngineError, SimulationResult
 
 # Business Constants
 THRESHOLD_BURNOUT_HIGH = 0.90
@@ -133,7 +133,7 @@ def assign_best_employee(
 def simulate_project_execution(
     projects: List[ExecutionProject],
     employees: List[Employee],
-) -> Dict[str, Any]:
+) -> SimulationResult:
     """
     Executes a deterministic simulation of multiple projects.
 
@@ -142,14 +142,15 @@ def simulate_project_execution(
         employees: List of employees available for work.
 
     Returns:
-        Dict[str, Any]: Results containing duration_weeks, utilization map, and burnout_risk map.
+        SimulationResult: Typed simulation metrics including duration and utilization.
     """
     if not employees:
-        return {
-            "duration_weeks": 0.0,
-            "utilization": {},
-            "burnout_risk": {},
-        }
+        return SimulationResult(
+            duration_weeks=0.0,
+            utilization={},
+            burnout_risk={},
+            project_completion_times={}
+        )
 
     # Track finish time and total hours for each employee
     employee_finish_time: Dict[str, float] = {e.id: 0.0 for e in employees}
@@ -233,10 +234,9 @@ def simulate_project_execution(
         else:
             burnout_risk_report[employee.id] = "LOW"
 
-    return {
-        "duration_weeks": round(simulation_duration, 2),
-        "utilization": utilization_report,
-        "burnout_risk": burnout_risk_report,
-        # BUG-4 FIX: Per-project completion for accurate revenue decay in finance.py
-        "project_completion_times": project_completion_times,
-    }
+    return SimulationResult(
+        duration_weeks=round(max(0.0, simulation_duration), 2),
+        utilization=utilization_report,
+        burnout_risk=burnout_risk_report,
+        project_completion_times=project_completion_times,
+    )

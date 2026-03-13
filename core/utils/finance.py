@@ -18,7 +18,7 @@ External Dependencies:
 
 import math
 from typing import List, Dict, Any, Optional
-from core.models import Employee, ExecutionProject
+from core.models import Employee, ExecutionProject, FinanceResult
 
 # Business Constants
 IDEAL_DELIVERY_WINDOW_WEEKS = 4.0
@@ -93,19 +93,19 @@ def compute_profit(
     employees: List[Employee],
     duration_weeks: float,
     project_completion_times: Optional[Dict[str, float]] = None,
-) -> Dict[str, float]:
+) -> FinanceResult:
     """
     Generates a consolidated profit and loss (P&L) snapshot.
 
     Returns:
-        Dict with 'revenue', 'cost', and 'profit' keys.
+        FinanceResult: Typed P&L footprint.
         Profit may be negative (valid loss scenario) but revenue is always >= 0.
     """
     realized_revenue = calculate_project_revenue(projects, duration_weeks, project_completion_times)
     total_labor_cost = calculate_operational_cost(employees, duration_weeks)
 
-    return {
-        "revenue": realized_revenue,
-        "cost":    total_labor_cost,
-        "profit":  round(realized_revenue - total_labor_cost, 2),
-    }
+    return FinanceResult(
+        revenue=realized_revenue,
+        cost=total_labor_cost,
+        profit=round(realized_revenue - total_labor_cost, 2),
+    )

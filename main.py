@@ -32,12 +32,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Internal Imports
+from core.settings import settings
 from core.context import REQUEST_ID
 
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Any
-from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+import asyncio
 
 from pydantic import BaseModel
 
@@ -48,7 +51,10 @@ from core.models import (
     StrategyType,
     SimulationEngineError,
     DecisionEngineError,
-    LLMEngineError
+    LLMEngineError,
+    ServiceResponse,
+    DecisionResult,
+    ExplanationResult
 )
 
 # Service Layer Imports
@@ -203,6 +209,12 @@ def load_system_state():
                         logger.error("employee_parse_error", extra={"employee_data": e_data, "error": str(e)})
                 app_ctx.employees = parsed_employees
                 app_ctx.employee_map = {e.id: e for e in parsed_employees}
+                
+                # PRODUCTION BOUNDARY: Check max employees
+                if len(app_ctx.employees) > settings.MAX_EMPLOYEES:
+                    logger.error("max_employees_exceeded", extra={"limit": settings.MAX_EMPLOYEES})
+                    raise ValueError(f"Too many employees loaded. Limit is {settings.MAX_EMPLOYEES}.")
+                    
         else:
             logger.warning("data_file_missing", extra={"path": data_path})
     except Exception as e:
@@ -237,6 +249,13 @@ def load_system_state():
                 ]
             )
         ]
+        
+        # PRODUCTION BOUNDARY: Check max tasks
+        total_tasks = sum(len(p.tasks) for p in app_ctx.projects)
+        if total_tasks > settings.MAX_TASKS_PER_PROJECT:
+            logger.error("max_tasks_exceeded", extra={"limit": settings.MAX_TASKS_PER_PROJECT})
+            raise ValueError(f"Too many tasks loaded. Limit is {settings.MAX_TASKS_PER_PROJECT}.")
+            
     except Exception as e:
         logger.error("project_initialization_failure", extra={"error": str(e)})
         app_ctx.projects = []
@@ -266,20 +285,75 @@ async def lifespan(app_instance):
     # (shutdown logic would go here if needed)
 
 @app.middleware("http")
-async def auth_placeholder(request, call_next):
+async def timeout_middleware(request: Request, call_next):
+    """Production protection against stalled requests."""
+    try:
+        return await asyncio.wait_for(call_next(request), timeout=settings.TIMEOUT_SECONDS)
+    except asyncio.TimeoutError:
+        logger.error("request_timeout", extra={"path": request.url.path})
+        return JSONResponse(
+            status_code=504,
+            content={"error": "Gateway Timeout", "message": "The request took too long to process."}
+        )
+
+# In-memory rate limiting dictionary (Production should use Redis)
+_rate_limits: Dict[str, Dict[str, Any]] = {}
+
+@app.middleware("http")
+async def rate_limiting_middleware(request: Request, call_next):
+    """Simple Sliding Window Rate Limiting."""
+    # Bypass health
+    if request.url.path == "/":
+        return await call_next(request)
+        
+    client_ip = request.client.host if request.client else "unknown"
+    now_ts = time.time()
+    
+    # Initialize or reset bucket
+    if client_ip not in _rate_limits or now_ts - _rate_limits[client_ip]["start_time"] > 60:
+        _rate_limits[client_ip] = {"start_time": now_ts, "count": 0}
+        
+    if _rate_limits[client_ip]["count"] >= settings.RATE_LIMIT_PER_MINUTE:
+        logger.warning("rate_limit_exceeded", extra={"client_ip": client_ip})
+        return JSONResponse(
+            status_code=429,
+            content={"error": "Too Many Requests", "message": "Rate limit exceeded"}
+        )
+        
+    _rate_limits[client_ip]["count"] += 1
+    return await call_next(request)
+
+@app.middleware("http")
+async def auth_placeholder(request: Request, call_next):
     """
-    Production Placeholder: Authentication and Authorization.
-    In a real SaaS environment, this would validate JWTs or API Keys.
+    Production Authentication Layer.
     """
     # bypass for health check
     if request.url.path == "/":
         return await call_next(request)
         
-    # Placeholder: In production, uncomment the following:
-    # if not request.headers.get("Authorization"):
-    #     raise HTTPException(status_code=401, detail="Authentication Required")
+    # Standardised API key validation
+    auth_header = request.headers.get("Authorization", "")
+    expected_token = f"Bearer {settings.API_KEY}"
+    
+    if settings.ENV != "development" and auth_header != expected_token:
+        logger.warning("unauthorized_access_attempt", extra={"path": request.url.path})
+        return JSONResponse(
+            status_code=401,
+            content={"error": "Unauthorized", "message": "Valid API Key required"}
+        )
     
     return await call_next(request)
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    """Production standard error structure for unexpected failures."""
+    logger.error("unhandled_server_error", extra={"error": str(exc), "path": request.url.path})
+    return JSONResponse(
+        status_code=500,
+        content={"error": "Internal Server Error", "message": "An unexpected system error occurred", "request_id": REQUEST_ID.get()}
+    )
+
 
 # =====================================================
 # API Endpoints (Routing Layer)
@@ -335,8 +409,8 @@ def validate_employee_exists(employee_id: Optional[str]):
     if employee_id and not app_ctx.has_employee(employee_id):
         raise HTTPException(status_code=404, detail=f"Employee {employee_id} not found")
 
-@app.post("/simulate")
-def simulate_scenario(request: SimulationRequest, background_tasks: BackgroundTasks):
+@app.post("/simulate", response_model=ServiceResponse)
+def simulate_scenario(request: SimulationRequest, background_tasks: BackgroundTasks) -> ServiceResponse:
     """Executes a high-fidelity workforce simulation."""
     start_time = time.time()
     try:
@@ -375,8 +449,8 @@ def simulate_scenario(request: SimulationRequest, background_tasks: BackgroundTa
         logger.error("api_unexpected_failure", extra={"endpoint": "/simulate", "error": str(e), "duration_ms": duration_ms})
         raise HTTPException(status_code=500, detail={"error": "Unexpected Engine Failure"})
 
-@app.post("/decision/compare")
-def compare_scenarios(request: DecisionRequest):
+@app.post("/decision/compare", response_model=DecisionResult)
+def compare_scenarios(request: DecisionRequest) -> DecisionResult:
     """Compares multiple HR strategies for a specific employee departure."""
     start_time = time.time()
     try:
@@ -404,8 +478,8 @@ def compare_scenarios(request: DecisionRequest):
         logger.error("api_unexpected_failure", extra={"endpoint": "/decision/compare", "error": str(e), "duration_ms": duration_ms})
         raise HTTPException(status_code=500, detail={"error": "Unexpected Engine Failure"})
 
-@app.post("/decision/explain")
-def explain_decision(request: DecisionRequest):
+@app.post("/decision/explain", response_model=ExplanationResult)
+def explain_decision(request: DecisionRequest) -> ExplanationResult:
     """Provides an LLM-driven interpretation of the best strategic choice."""
     start_time = time.time()
     try:
