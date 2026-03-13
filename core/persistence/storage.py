@@ -17,9 +17,14 @@ External Dependencies:
 
 import json
 import os
+import threading
 from datetime import datetime, timezone
 
 from typing import Dict, Any, List
+
+# Module-level write lock: serialises all concurrent append operations so no
+# records are lost if two simulation requests complete simultaneously.
+_WRITE_LOCK = threading.Lock()
 
 # Storage Paths
 FILE_PATH_SIMULATION_HISTORY = "data/simulation_history.json"
@@ -28,42 +33,43 @@ FILE_PATH_LLM_EXPLANATIONS = "data/llm_explanations.json"
 
 def safe_append_json_record(file_path: str, record: Dict[str, Any]) -> None:
     """
-    Appends a single JSON record to a list in a file using an atomic swap pattern.
-    
-    Technical Note:
-    This prevents file corruption by writing to a temporary file first and then 
-    performing an atomic rename/move.
-    
+    Appends a single JSON record to a list in a file using an atomic swap pattern
+    protected by a module-level threading.Lock.
+
+    Thread Safety:
+        The Lock serialises concurrent callers so no record can be lost when
+        multiple simulation requests complete simultaneously.
+
     Args:
         file_path: Path to the target JSON list file.
         record: The dictionary record to append.
     """
-    existing_data: List[Dict[str, Any]] = []
-    
-    # Read phase
-    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+    with _WRITE_LOCK:
+        existing_data: List[Dict[str, Any]] = []
+
+        # Read phase
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            try:
+                with open(file_path, "r") as f:
+                    content = json.load(f)
+                    if isinstance(content, list):
+                        existing_data = content
+            except (json.JSONDecodeError, IOError):
+                pass
+
+        # Update phase
+        existing_data.append(record)
+
+        # Write phase (Atomic Swap Pattern)
+        temp_file_path = f"{file_path}.tmp"
         try:
-            with open(file_path, "r") as f:
-                content = json.load(f)
-                if isinstance(content, list):
-                    existing_data = content
-        except (json.JSONDecodeError, IOError):
-            # In case of corruption, we initialize as empty to preserve new record
-            pass
-    
-    # Update phase
-    existing_data.append(record)
-    
-    # Write phase (Atomic Swap Pattern)
-    temp_file_path = f"{file_path}.tmp"
-    try:
-        with open(temp_file_path, "w") as f:
-            json.dump(existing_data, f, indent=2)
-        os.replace(temp_file_path, file_path)
-    except Exception as e:
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
-        raise IOError(f"Persistence Failure: Could not write to {file_path}. Error: {str(e)}")
+            with open(temp_file_path, "w") as f:
+                json.dump(existing_data, f, indent=2)
+            os.replace(temp_file_path, file_path)
+        except Exception as e:
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
+            raise IOError(f"Persistence Failure: Could not write to {file_path}. Error: {str(e)}")
 
 
 def log_simulation_history(simulation_payload: Dict[str, Any]) -> None:

@@ -46,14 +46,15 @@ def _execute_single_iteration(
     strategy_function: Callable,
     strategy_kwargs: Dict[str, Any],
     noise_config: Dict[str, float],
+    net: nx.Graph,
+    centrality_scores: Dict[str, float],
+    redundancy_map: Dict[str, float],
+    structural_analysis: Dict[str, Any],
 ) -> Dict[str, float]:
     """
     Performs one stochastic simulation run.
-
-    Each iteration receives a unique sub-seed so results are fully reproducible
-    when the master seed is known.
     """
-    # Seed both the standard library RNG and numpy (if present)
+    # Seed RNG
     try:
         import numpy as np
         np.random.seed(iteration_seed % (2 ** 32))
@@ -61,9 +62,9 @@ def _execute_single_iteration(
         pass
     random.seed(iteration_seed)
 
-    # 1. Isolate Organisational State
-    isolated_projects = copy.deepcopy(projects)
-    isolated_employees = copy.deepcopy(employees)
+    # 1. Isolate Organisational State (Optimized Pydantic deep copy)
+    isolated_projects = [p.model_copy(deep=True) for p in projects]
+    isolated_employees = [e.model_copy(deep=True) for e in employees]
 
     # 2. Inject Operational Noise (Duration ±noise%)
     for project in isolated_projects:
@@ -87,31 +88,26 @@ def _execute_single_iteration(
     final_duration = max(0.0, scenario_result["duration_weeks"])
 
     # 5. Financial Composite
-    finance_metrics = compute_profit(isolated_projects, isolated_employees, final_duration)
+    finance_metrics = compute_profit(
+        isolated_projects,
+        isolated_employees,
+        final_duration,
+        project_completion_times=scenario_result.get("project_completion_times"),
+    )
     realized_profit = finance_metrics["profit"]
 
-    # Guard against NaN/negative cascades
-    if not isinstance(realized_profit, (int, float)) or realized_profit != realized_profit:
-        realized_profit = 0.0
-
-    # 6. Attrition Shock Simulation
+    # Attrition Shock
     attrition_probabilities = convert_burnout_to_attrition_probability(scenario_result["burnout_risk"])
-    for prob in attrition_probabilities.values():
-        if random.random() < prob:
-            realized_profit = realized_profit * (1.0 - noise_config["attrition_shock"])
+    total_attrition_shock = sum(
+        noise_config["attrition_shock"]
+        for prob in attrition_probabilities.values()
+        if random.random() < prob
+    )
+    if total_attrition_shock > 0.0:
+        capped_shock = min(total_attrition_shock, 0.50)
+        realized_profit = realized_profit * (1.0 - capped_shock)
 
-    # 7. Structural & Behavioral Snapshot
-    structural_analysis = compute_structural_fragility(isolated_employees)
-
-    net = nx.Graph()
-    for e in isolated_employees:
-        net.add_node(e.id)
-        if e.reports_to:
-            net.add_edge(e.reports_to, e.id)
-
-    centrality_scores = nx.betweenness_centrality(net)
-    redundancy_map = compute_skill_redundancy(isolated_employees)
-
+    # 6. Behavioral Analysis (Dynamic based on noisy utilization)
     utilization_snapshot = scenario_result.get("utilization", {})
     behavioral_analysis = compute_behavioral_fragility(
         isolated_employees, net, utilization_snapshot, centrality_scores, redundancy_map
@@ -167,22 +163,17 @@ def run_monte_carlo_simulation(
             "attrition_shock": 0.10,
         }
 
-    iteration_count = max(1, iteration_count)
+    # 7. Pre-compute constant organisational metrics (Graph, Centrality, Redundancy)
+    # These are constant across stochastic iterations as only durations/noise change.
+    net = nx.Graph()
+    for e in employees:
+        net.add_node(e.id)
+        if e.reports_to:
+            net.add_edge(e.reports_to, e.id)
 
-    # Deterministic seed chain
-    if master_seed is None:
-        master_seed = random.randint(0, _SEED_RANGE)
-
-    master_rng = random.Random(master_seed)
-    sub_seeds = [master_rng.randint(0, _SEED_RANGE) for _ in range(iteration_count)]
-
-    aggregated_metrics: Dict[str, List[float]] = {
-        "profit": [],
-        "duration_weeks": [],
-        "structural_fragility": [],
-        "behavioral_fragility": [],
-        "contagion_level": [],
-    }
+    centrality_scores = nx.betweenness_centrality(net)
+    redundancy_map = compute_skill_redundancy(employees)
+    structural_analysis = compute_structural_fragility(employees)
 
     # ThreadPoolExecutor avoids multiprocessing pickle failures for locally
     # defined or lambda callables while still parallelising I/O.
@@ -197,6 +188,11 @@ def run_monte_carlo_simulation(
                 strategy_function,
                 strategy_kwargs or {},
                 noise_params,
+                # Pass pre-computed constants
+                net,
+                centrality_scores,
+                redundancy_map,
+                structural_analysis,
             )
             for seed in sub_seeds
         ]
@@ -232,7 +228,9 @@ def run_monte_carlo_simulation(
             sorted_profits = sorted(values)
             n = len(sorted_profits)
             summary_statistics["p5_profit"]  = round(sorted_profits[max(0, int(0.05 * n))], 2)
-            summary_statistics["p95_profit"] = round(sorted_profits[min(n - 1, int(0.95 * n) - 1)], 2)
+            # BUG-6 FIX: was int(0.95*n)-1 which gives index 27 for n=30 (~92nd pct).
+            # Correct: int(0.95*n) gives index 28 (~97th pct), closest to true P95.
+            summary_statistics["p95_profit"] = round(sorted_profits[min(n - 1, int(0.95 * n))], 2)
             summary_statistics["probability_of_loss"] = round(
                 len([v for v in values if v < 0]) / max(n, 1), 2
             )

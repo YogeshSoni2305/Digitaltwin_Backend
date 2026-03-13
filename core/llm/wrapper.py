@@ -10,7 +10,7 @@ class LLMWrapper:
     """
     Hardened wrapper for LLM interactions with strict isolation and fallback.
     """
-    def __init__(self, model: str = "openai/gpt-oss-120b"):
+    def __init__(self, model: str = "llama-3.1-70b-versatile"):
         self.api_key = os.environ.get("GROQ_API_KEY")
         self.model = model
         self.client = None
@@ -42,7 +42,8 @@ class LLMWrapper:
                     {"role": "user", "content": user_context}
                 ],
                 temperature=temperature,
-                stream=False
+                stream=False,
+                timeout=10.0  # Prevents hanging on slow LLM responses
             )
             
             latency_ms = int((time.time() - start_time) * 1000)

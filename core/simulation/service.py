@@ -145,8 +145,13 @@ def run_standard_simulation(
         noise_params=noise_config,
     )
 
-    # 4. Financial Post-Processing
-    finance_metrics = compute_profit(projects, employees, execution_result["duration_weeks"])
+    # 4. Financial Post-Processing (BUG-9 FIX: pass per-project completion times)
+    finance_metrics = compute_profit(
+        projects,
+        employees,
+        execution_result["duration_weeks"],
+        project_completion_times=execution_result.get("project_completion_times"),
+    )
 
     # 5. Organisational Health & Structural Risk
     redundancy_map = compute_skill_redundancy(employees)

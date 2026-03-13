@@ -17,7 +17,7 @@ External Dependencies:
 """
 
 import math
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from core.models import Employee, ExecutionProject
 
 # Business Constants
@@ -31,25 +31,31 @@ _EPSILON = 1e-9
 def calculate_project_revenue(
     projects: List[ExecutionProject],
     total_duration_weeks: float,
+    project_completion_times: Optional[Dict[str, float]] = None,
 ) -> float:
     """
     Calculates total revenue across all projects, accounting for exponential time-decay
     beyond the ideal delivery window.
 
-    Fix 10: Revenue is clamped to [0, ∞) to prevent negative values from extreme decay rates.
+    BUG-7 FIX: Each project now uses its own completion time (from project_completion_times)
+    rather than the global max simulation duration. This prevents a long project from
+    penalizing revenue of a short project that finished on time.
 
     Args:
         projects: List of projects to evaluate.
-        total_duration_weeks: Final simulation duration in weeks.
+        total_duration_weeks: Fallback global duration if per-project times are unavailable.
+        project_completion_times: Optional dict of {project_id: completion_week}.
 
     Returns:
         float: Total realized revenue (never negative).
     """
     aggregate_revenue = 0.0
+    pct = project_completion_times or {}
 
     for project in projects:
-        # Revenue decay kicks in if work exceeds the ideal window
-        delivery_delay = max(0.0, total_duration_weeks - IDEAL_DELIVERY_WINDOW_WEEKS)
+        # Use per-project completion time; fall back to global duration
+        proj_duration = pct.get(project.id, total_duration_weeks)
+        delivery_delay = max(0.0, proj_duration - IDEAL_DELIVERY_WINDOW_WEEKS)
 
         # Formula: Revenue = Base * e^(-decay_rate * delay)
         realized_revenue = project.base_revenue * math.exp(
@@ -86,6 +92,7 @@ def compute_profit(
     projects: List[ExecutionProject],
     employees: List[Employee],
     duration_weeks: float,
+    project_completion_times: Optional[Dict[str, float]] = None,
 ) -> Dict[str, float]:
     """
     Generates a consolidated profit and loss (P&L) snapshot.
@@ -94,7 +101,7 @@ def compute_profit(
         Dict with 'revenue', 'cost', and 'profit' keys.
         Profit may be negative (valid loss scenario) but revenue is always >= 0.
     """
-    realized_revenue = calculate_project_revenue(projects, duration_weeks)
+    realized_revenue = calculate_project_revenue(projects, duration_weeks, project_completion_times)
     total_labor_cost = calculate_operational_cost(employees, duration_weeks)
 
     return {

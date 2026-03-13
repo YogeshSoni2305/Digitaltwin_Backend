@@ -24,8 +24,19 @@ from core.models import Employee
 from core.utils.structure import validate_span_of_control, build_reporting_map
 from core.utils.skills import compute_skill_redundancy
 
-# Internal Structural Cache
+# Internal Structural Cache (bounded at 128 entries to prevent unbounded memory growth)
+import threading
+
 _STRUCTURAL_METRICS_CACHE: Dict[str, Dict[str, Any]] = {}
+_CACHE_LOCK = threading.Lock()
+_MAX_CACHE_ENTRIES = 128
+
+
+def _maybe_evict_cache() -> None:
+    """Simple LRU-style eviction: clear all if limit reached."""
+    with _CACHE_LOCK:
+        if len(_STRUCTURAL_METRICS_CACHE) >= _MAX_CACHE_ENTRIES:
+            _STRUCTURAL_METRICS_CACHE.clear()
 
 # Quantitative Thresholds
 FRAGILITY_THRESHOLD_HIGH = 60.0
@@ -78,9 +89,10 @@ def compute_structural_fragility(employees: List[Employee]) -> Dict[str, Any]:
 
     structure_digest = _generate_organizational_digest(employees)
     
-    # Cache lookup
-    if structure_digest in _STRUCTURAL_METRICS_CACHE:
-        return _STRUCTURAL_METRICS_CACHE[structure_digest]
+    # Thread-safe Cache lookup
+    with _CACHE_LOCK:
+        if structure_digest in _STRUCTURAL_METRICS_CACHE:
+            return _STRUCTURAL_METRICS_CACHE[structure_digest]
 
     # 1. Network Analysis (Centralization + Influence)
     reporting_graph = nx.Graph()
@@ -94,12 +106,20 @@ def compute_structural_fragility(employees: List[Employee]) -> Dict[str, Any]:
     max_centralization = max(centrality_map.values()) if centrality_map else 0.0
 
     # 1b. Eigenvector Centrality (Influence of influence)
+    # BUG-8 FIX: eigenvector_centrality_numpy requires numpy which is not in
+    # requirements.txt. Fall back to the pure-Python power iteration method.
     try:
-        # Use numpy implementation for better performance/stability if available
-        eigen_map = nx.eigenvector_centrality_numpy(reporting_graph) if len(employees) > 1 else {emp.id: 1.0 for emp in employees}
+        if len(employees) > 1:
+            try:
+                eigen_map = nx.eigenvector_centrality_numpy(reporting_graph)
+            except Exception:
+                # numpy unavailable or singular matrix — use power iteration fallback
+                eigen_map = nx.eigenvector_centrality(reporting_graph, max_iter=500, tol=1e-6)
+        else:
+            eigen_map = {emp.id: 1.0 for emp in employees}
         max_influence = max(eigen_map.values()) if eigen_map else 0.0
     except Exception:
-        max_influence = 0.0 # Fallback for disconnected/singular graphs
+        max_influence = 0.0  # final fallback for disconnected/singular graphs
 
     # 1c. Clustering Coefficient (Local cohesion)
     avg_clustering = nx.average_clustering(reporting_graph) if len(employees) > 2 else 0.0
@@ -157,6 +177,7 @@ def compute_structural_fragility(employees: List[Employee]) -> Dict[str, Any]:
         }
     }
     
-    # Persistence in cache
+    # Bounded cache write — evict oldest entry if at capacity
+    _maybe_evict_cache()
     _STRUCTURAL_METRICS_CACHE[structure_digest] = risk_result
     return risk_result

@@ -38,35 +38,50 @@ def compare_hr_strategies(
     """
     Simulates a matrix of HR strategies and ranks them to find the optimal outcome.
     """
+    # FIX-3: Added BASELINE as the control reference so all departure strategies
+    # are compared against the status-quo outcome.
     strategy_options = [
-        StrategyType.NO_REPLACE, 
-        StrategyType.IMMEDIATE, 
-        StrategyType.DELAYED
+        StrategyType.BASELINE,
+        StrategyType.NO_REPLACE,
+        StrategyType.IMMEDIATE,
+        StrategyType.DELAYED,
     ]
     scenario_outcomes = []
-    
+
     for strategy in strategy_options:
         simulation_data = run_standard_simulation(
             projects, employees, strategy, target_employee_id, random_seed=random_seed, model_config=model_config
         )
-        
-        # Extract metrics for the ranking engine
-        metrics = simulation_data["organization"].copy()
-        metrics["profit"] = simulation_data["risk"]["average_profit"]
-        metrics["volatility"] = simulation_data["risk"]["profit_variance"]
-        metrics["stability_score"] = simulation_data["risk"]["stability_score"]
-        
-        # Calculate categorical burnout concentration for ranking logic
+
+        org = simulation_data["organization"]
+        risk = simulation_data["risk"]
+
+        # FIX-1: Build canonical metric dict that matches ranking.py metric_keys exactly.
+        # Previously used organization.copy() which injected mismatched keys:
+        #   "health_score"             → ranking expects "org_health"
+        #   "structural_fragility_score" → ranking expects "fragility_score"
+        #   "risk_level"               → string, not numeric — unusable in MAUT
+        metrics = {
+            "profit":                    risk["average_profit"],
+            "volatility":                risk["profit_variance"],
+            "stability_score":           risk["stability_score"],
+            "org_health":                org["health_score"],               # canonical name
+            "fragility_score":           org["structural_fragility_score"],  # canonical name
+            "behavioral_fragility_index": org["behavioral_fragility_index"],
+        }
+
+        # Burnout concentration: fraction of team at HIGH or MEDIUM burnout
         burnout_map = simulation_data["execution"]["burnout_risk"]
         burnout_concentration = (
             len([v for v in burnout_map.values() if v in ["HIGH", "MEDIUM"]]) / len(burnout_map)
             if burnout_map else 0.0
         )
         metrics["burnout_index"] = burnout_concentration
-        
-        # Attach identity
+
+        # Attach strategy identity
         metrics["strategy"] = strategy
         scenario_outcomes.append(metrics)
+
 
     # Invoke Ranking Engine
     try:

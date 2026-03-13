@@ -32,7 +32,7 @@ from core.persistence.storage import safe_append_json_record, FILE_PATH_LLM_EXPL
 from core.llm.wrapper import LLMWrapper
 
 # Business Metadata
-DEFAULT_LLM_MODEL = "openai/gpt-oss-120b"
+DEFAULT_LLM_MODEL = "llama-3.1-70b-versatile"
 DEFAULT_SIMULATION_VERSION = "v3.0-enterprise"
 
 # Singleton instance per lifecycle

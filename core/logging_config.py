@@ -6,9 +6,11 @@ from datetime import datetime, timezone
 class JsonFormatter(logging.Formatter):
     def format(self, record):
         try:
-            # Base log entry with UTC timestamp
+            # Base log entry with UTC timestamp and Request ID tracing
+            from core.context import REQUEST_ID
             log_entry = {
                 "time": datetime.now(timezone.utc).isoformat(),
+                "request_id": REQUEST_ID.get(),
                 "level": record.levelname,
                 "event": getattr(record, "event", record.msg if isinstance(record.msg, str) else "structured_event"),
                 "logger": record.name,

@@ -54,15 +54,20 @@ def compute_aggregate_decision_score(
     """
     total_weighted_score = 0.0
     
-    # Mapping of simulation output keys to configuration weight keys
+    # Mapping of canonical metric field names → config weight keys
+    # FIX-4: 'fragility_score' previously mapped to 'structural_fragility' which does
+    # not exist in the default model_config decision_weights dict:
+    #   {profit:0.4, org_health:0.2, fragility:0.2, stability:0.2}
+    # This caused the 0.2 fragility weight to be permanently dead.
+    # Corrected to map to 'fragility' as defined in the config.
     WEIGHT_KEY_MAPPING = {
-        "profit": "profit",
-        "org_health": "org_health",
-        "volatility": "volatility",
-        "burnout_index": "burnout",
-        "fragility_score": "structural_fragility",
-        "behavioral_fragility_index": "behavioral_fragility",
-        "stability_score": "stability"
+        "profit":                     "profit",        # weight 0.4 in default config
+        "org_health":                 "org_health",    # weight 0.2 in default config
+        "volatility":                 "volatility",   # optional — 0 if not in config
+        "burnout_index":              "burnout",       # optional — 0 if not in config
+        "fragility_score":            "fragility",     # weight 0.2 in default config (FIXED)
+        "behavioral_fragility_index": "behavioral_fragility",  # optional
+        "stability_score":            "stability"     # weight 0.2 in default config
     }
     
     # Polarities: Impact on final score (1 for beneficial, -1 for risk/detrimental)

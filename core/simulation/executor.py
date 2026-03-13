@@ -19,7 +19,7 @@ External Dependencies:
 import math
 import networkx as nx
 from typing import List, Dict, Optional, Any
-from core.models import Employee, ExecutionProject, ExecutionTask
+from core.models import Employee, ExecutionProject, ExecutionTask, SimulationEngineError
 
 # Business Constants
 THRESHOLD_BURNOUT_HIGH = 0.90
@@ -156,11 +156,19 @@ def simulate_project_execution(
     employee_total_hours: Dict[str, float] = {e.id: 0.0 for e in employees}
 
     task_completion_weeks: Dict[str, float] = {}
+    project_completion_times: Dict[str, float] = {}
     simulation_duration = 0.0
 
     for project in projects:
         task_graph = build_task_graph(project)
-        execution_order = list(nx.topological_sort(task_graph))
+        try:
+            execution_order = list(nx.topological_sort(task_graph))
+        except nx.NetworkXUnfeasible:
+            raise SimulationEngineError(
+                f"Cycle detected in task dependency graph for project '{project.id}'. "
+                "Check task dependency definitions."
+            )
+        project_peak = 0.0
 
         for task_id in execution_order:
             task_data: ExecutionTask = task_graph.nodes[task_id]["data"]
@@ -183,7 +191,10 @@ def simulate_project_execution(
 
             # Capacity guard: avoid division-by-zero for zero-capacity employees
             capacity = max(assigned_employee.capacity_hours_per_week, _EPSILON)
-            weeks_required = task_data.estimated_hours / capacity
+            # BUG-1 FIX: Apply productivity_multiplier so replacement/restructured hires
+            # take proportionally longer — a multiplier of 0.5 means 2x the hours.
+            effective_multiplier = max(assigned_employee.productivity_multiplier, _EPSILON)
+            weeks_required = task_data.estimated_hours / (capacity * effective_multiplier)
 
             task_start_week = max(earliest_start_week, employee_finish_time[assigned_employee.id])
             task_finish_week = task_start_week + weeks_required
@@ -193,7 +204,10 @@ def simulate_project_execution(
             employee_total_hours[assigned_employee.id] += task_data.estimated_hours
             task_completion_weeks[task_data.id] = task_finish_week
 
+            project_peak = max(project_peak, task_finish_week)
             simulation_duration = max(simulation_duration, task_finish_week)
+
+        project_completion_times[project.id] = round(project_peak, 2)
 
     # Post-Calculation: Utilization and Burnout
     utilization_report: Dict[str, float] = {}
@@ -208,17 +222,21 @@ def simulate_project_execution(
             if total_potential_capacity > _EPSILON
             else 0.0
         )
-        utilization_report[employee.name] = round(usage_rate, 2)
+        # BUG-3 FIX: Key by employee.id (not name) so behavioral engine can match
+        # these against the NetworkX graph nodes which are also keyed by employee.id.
+        utilization_report[employee.id] = round(usage_rate, 2)
 
         if usage_rate > THRESHOLD_BURNOUT_HIGH:
-            burnout_risk_report[employee.name] = "HIGH"
+            burnout_risk_report[employee.id] = "HIGH"
         elif usage_rate > THRESHOLD_BURNOUT_MEDIUM:
-            burnout_risk_report[employee.name] = "MEDIUM"
+            burnout_risk_report[employee.id] = "MEDIUM"
         else:
-            burnout_risk_report[employee.name] = "LOW"
+            burnout_risk_report[employee.id] = "LOW"
 
     return {
         "duration_weeks": round(simulation_duration, 2),
         "utilization": utilization_report,
         "burnout_risk": burnout_risk_report,
+        # BUG-4 FIX: Per-project completion for accurate revenue decay in finance.py
+        "project_completion_times": project_completion_times,
     }
