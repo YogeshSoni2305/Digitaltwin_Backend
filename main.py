@@ -129,43 +129,8 @@ class MergeRequest(BaseModel):
     seed: Optional[int] = 42
 
 # =====================================================
-# Request Context & Middleware
-# =====================================================
-
-@app.middleware("http")
-async def add_request_id(request, call_next):
-    """Injects a unique request ID into the context for traceability."""
-    request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
-    token = REQUEST_ID.set(request_id)
-    try:
-        response = await call_next(request)
-        response.headers["X-Request-ID"] = request_id
-        return response
-    finally:
-        REQUEST_ID.reset(token)
-
-# =====================================================
 # App Initialization & Governance
 # =====================================================
-
-app = FastAPI(
-    title="Workforce Digital Twin API",
-    version="3.0",
-    description="Deterministic Enterprise Workforce Simulation Engine",
-    lifespan=lifespan,
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://workforce-twin.vercel.app"
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 def validate_system_integrity():
     """Validates that the application context has loaded correctly."""
@@ -283,6 +248,42 @@ async def lifespan(app_instance):
 
     yield  # server is now running
     # (shutdown logic would go here if needed)
+
+# =====================================================
+# Request Context & Middleware
+# =====================================================
+
+app = FastAPI(
+    title="Workforce Digital Twin API",
+    version="3.0",
+    description="Deterministic Enterprise Workforce Simulation Engine",
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://workforce-twin.vercel.app"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.middleware("http")
+async def add_request_id(request, call_next):
+    """Injects a unique request ID into the context for traceability."""
+    request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
+    token = REQUEST_ID.set(request_id)
+    try:
+        response = await call_next(request)
+        response.headers["X-Request-ID"] = request_id
+        return response
+    finally:
+        REQUEST_ID.reset(token)
 
 @app.middleware("http")
 async def timeout_middleware(request: Request, call_next):
